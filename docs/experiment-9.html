@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09. Objects — Modelling the World — Python Programming Lab</title>
+<meta name="description" content="Classes, inheritance, overriding, and operator overloading">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> All experiments</span></a>
+    <span class="sep">/</span>
+    <span class="now">Experiment 09</span>
+    <span class="spacer"></span>
+    <span class="progress" title="9 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i></span>
+    <span class="progress-num">9/10</span>
+  </div>
+</div>
+
+<header class="chead wrap">
+  <p class="eyebrow">Experiment 09 · Intermediate</p>
+  <h1>Objects — Modelling the World</h1>
+  <p class="sub">Classes, inheritance, overriding, and operator overloading</p>
+  <blockquote class="pullquote">Functions organise behaviour. Classes organise behaviour together with the data it acts on.</blockquote>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="On this page">
+    <a href="#idea">The big idea</a>
+    <a href="#works">How it works</a>
+    <a href="#tasks">The tasks</a>
+    <a href="#pitfalls">Pitfalls</a>
+  </nav>
+
+  <main class="prose">
+    <h2 id="idea">The big idea</h2>
+    <p>Consider storing a student. You could use three parallel lists — names, IDs, marks — and trust that
+index 4 means the same person in all three. It works, and it is fragile: sort one list and the whole
+structure silently corrupts.</p>
+<p><strong>Object-oriented programming</strong> offers a better model. A <strong>class</strong> is a blueprint describing what a
+kind of thing <em>has</em> (its data, called attributes) and what it can <em>do</em> (its behaviour, called methods).
+An <strong>object</strong> is one concrete thing built from that blueprint. <code>Student</code> is the class; Naina, Devansh
+and Ritika are objects. Each carries its own data, and each carries its behaviour with it — the
+percentage calculation lives <em>on</em> the student rather than floating loose in the program.</p>
+<p>Three further ideas make this powerful.</p>
+<p><strong>Inheritance</strong> lets a class build on another. A <code>SportsCar</code> inherits everything <code>Car</code> can do, which
+inherits from <code>Vehicle</code> — write shared behaviour once, specialise where it differs. <strong>Overriding</strong>
+lets a child replace a parent's method with its own version, so <code>Circle.area()</code> computes properly while
+still being callable as just <code>.area()</code> on any shape. And <strong>operator overloading</strong> teaches your own
+classes to work with Python's built-in operators, so <code>v1 + v2</code> on two vectors does the sensible thing
+via the special method <code>__add__</code>.</p>
+<p>That last idea explains something you have been using all along: <code>+</code> on numbers, strings and lists all
+behave differently because each type defines its own <code>__add__</code>. You are not learning a new mechanism —
+you are learning how the mechanism you have used since chapter one actually works.</p>
+
+    <figure class="figure reveal">
+      <img src="assets/ch9.png" alt="One blueprint, many objects — and inheritance to specialise without repeating.">
+      <figcaption>One blueprint, many objects — and inheritance to specialise without repeating.</figcaption>
+    </figure>
+
+    <h2 id="works">How it works</h2>
+    <h3>Anatomy of a class</h3>
+<pre><code class="language-python">class Student:
+    def __init__(self, name, marks):   # the constructor
+        self.name = name               # attribute stored on THIS object
+        self.marks = marks
+
+    def percentage(self):              # a method
+        return sum(self.marks.values()) / len(self.marks)
+</code></pre>
+<p><code>__init__</code> runs automatically whenever you create an object and sets up its starting state.
+<code>self</code> is the object the method was called on — it is passed automatically, which is why
+<code>naina.percentage()</code> needs no arguments despite the definition listing one.</p>
+<h3>The three inheritance shapes</h3>
+<table>
+<thead>
+<tr>
+<th>Shape</th>
+<th>Structure</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single</td>
+<td>one parent</td>
+<td><code>Manager(Employee)</code></td>
+</tr>
+<tr>
+<td>Multilevel</td>
+<td>a chain</td>
+<td><code>Vehicle → Car → SportsCar</code></td>
+</tr>
+<tr>
+<td>Multiple</td>
+<td>two parents at once</td>
+<td><code>Triathlete(Swimmer, Runner)</code></td>
+</tr>
+</tbody>
+</table>
+<p>With multiple inheritance Python resolves name clashes using the <strong>MRO</strong> (method resolution order) —
+left to right through the parent list.</p>
+<h3>Dunder methods</h3>
+<p>Methods named with double underscores hook into Python's built-in behaviour:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Triggered by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__init__</code></td>
+<td>creating the object</td>
+</tr>
+<tr>
+<td><code>__str__</code></td>
+<td><code>print(obj)</code></td>
+</tr>
+<tr>
+<td><code>__repr__</code></td>
+<td>inspecting the object</td>
+</tr>
+<tr>
+<td><code>__add__</code></td>
+<td><code>obj1 + obj2</code></td>
+</tr>
+<tr>
+<td><code>__len__</code></td>
+<td><code>len(obj)</code></td>
+</tr>
+<tr>
+<td><code>__eq__</code></td>
+<td><code>obj1 == obj2</code></td>
+</tr>
+</tbody>
+</table>
+<p>Defining <code>__repr__</code> is a small habit with a large payoff — it turns useless debug output like
+<code>&lt;Vector2D object at 0x7f8b&gt;</code> into <code>Vector2D(x=14, y=9)</code>.</p>
+
+    <h2 id="tasks">The tasks</h2>
+    <p>Everything above was theory. What follows is the lab work — each task stated,
+       explained, then solved with code that really ran.</p>
+    
+      <section class="task reveal">
+        <p class="task-label">Task 1</p>
+        <h3 id="task-1">Task 1 — A Minimal Student Class</h3>
+        <p>Three objects from one blueprint, each displaying its own details.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [1]:</div>
+            <div class="io-body"><pre><span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_name</span><span class="p">,</span> <span class="n">reg_id</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">full_name</span> <span class="o">=</span> <span class="n">full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_id</span> <span class="o">=</span> <span class="n">reg_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">full_name</span><span class="si">}</span><span class="s2">, Reg ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_id</span><span class="si">}</span><span class="s2">, Marks: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="n">learners</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Naina&quot;</span><span class="p">,</span> <span class="s2">&quot;6001&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">82</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">74</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">90</span><span class="p">}),</span>
+    <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Devansh&quot;</span><span class="p">,</span> <span class="s2">&quot;6002&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">65</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">71</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">58</span><span class="p">}),</span>
+    <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Ritika&quot;</span><span class="p">,</span> <span class="s2">&quot;6003&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">93</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">88</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">}),</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">learner</span> <span class="ow">in</span> <span class="n">learners</span><span class="p">:</span>
+    <span class="n">learner</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[1]:</div>
+          <div class="io-body"><pre>Name: Naina, Reg ID: 6001, Marks: {&#x27;phy&#x27;: 82, &#x27;chem&#x27;: 74, &#x27;maths&#x27;: 90}
+Name: Devansh, Reg ID: 6002, Marks: {&#x27;phy&#x27;: 65, &#x27;chem&#x27;: 71, &#x27;maths&#x27;: 58}
+Name: Ritika, Reg ID: 6003, Marks: {&#x27;phy&#x27;: 93, &#x27;chem&#x27;: 88, &#x27;maths&#x27;: 95}
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 2</p>
+        <h3 id="task-2">Task 2 — Adding Percentage and Pass/Fail Logic</h3>
+        <p>Two methods on top of the constructor: <code>marks_percentage()</code> and <code>result()</code>
+(pass requires every subject above 40). A standalone function then computes
+the class-wide average percentage across all records.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [2]:</div>
+            <div class="io-body"><pre><span class="k">class</span><span class="w"> </span><span class="nc">StudentRecord</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_name</span><span class="p">,</span> <span class="n">reg_id</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">full_name</span> <span class="o">=</span> <span class="n">full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_id</span> <span class="o">=</span> <span class="n">reg_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">full_name</span><span class="si">}</span><span class="s2"> | Reg ID: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_id</span><span class="si">}</span><span class="s2"> | Marks: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">marks_percentage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Pass&quot;</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">m</span> <span class="o">&gt;</span> <span class="mi">40</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">else</span> <span class="s2">&quot;Fail&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cohort_average</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">marks_percentage</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+
+
+<span class="n">raw_records</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;Naina&quot;</span><span class="p">,</span> <span class="s2">&quot;6001&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">82</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">74</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">90</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;Devansh&quot;</span><span class="p">,</span> <span class="s2">&quot;6002&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">65</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">71</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">58</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;Ritika&quot;</span><span class="p">,</span> <span class="s2">&quot;6003&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;phy&quot;</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span> <span class="s2">&quot;chem&quot;</span><span class="p">:</span> <span class="mi">88</span><span class="p">,</span> <span class="s2">&quot;maths&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">}),</span>
+<span class="p">]</span>
+
+<span class="n">all_records</span> <span class="o">=</span> <span class="p">[</span><span class="n">StudentRecord</span><span class="p">(</span><span class="o">*</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">raw_records</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">all_records</span><span class="p">:</span>
+    <span class="n">rec</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Percentage:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rec</span><span class="o">.</span><span class="n">marks_percentage</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">rec</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cohort average percentage:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cohort_average</span><span class="p">(</span><span class="n">all_records</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[2]:</div>
+          <div class="io-body"><pre>Name: Naina | Reg ID: 6001 | Marks: {&#x27;phy&#x27;: 82, &#x27;chem&#x27;: 74, &#x27;maths&#x27;: 90}
+Percentage: 82.00%
+Result: Pass
+----------------------------------------
+Name: Devansh | Reg ID: 6002 | Marks: {&#x27;phy&#x27;: 65, &#x27;chem&#x27;: 71, &#x27;maths&#x27;: 58}
+Percentage: 64.67%
+Result: Pass
+----------------------------------------
+Name: Ritika | Reg ID: 6003 | Marks: {&#x27;phy&#x27;: 33, &#x27;chem&#x27;: 88, &#x27;maths&#x27;: 95}
+Percentage: 72.00%
+Result: Fail
+----------------------------------------
+Cohort average percentage: 72.89%
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 3</p>
+        <h3 id="task-3">Task 3 — Single, Multilevel, and Multiple Inheritance</h3>
+        <p>Three separate class hierarchies, each demonstrating one style of
+inheritance, exercised at the bottom.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [3]:</div>
+            <div class="io-body"><pre><span class="c1"># Single inheritance</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Employee</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">introduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I work here.&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Manager</span><span class="p">(</span><span class="n">Employee</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lead_team</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I lead a small team.&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Multilevel inheritance</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vehicle</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Engine started.&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Car</span><span class="p">(</span><span class="n">Vehicle</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Driving on the road.&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SportsCar</span><span class="p">(</span><span class="n">Car</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">turbo_boost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Turbo engaged!&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Multiple inheritance</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Swimmer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">swim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Swimming laps.&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Runner</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running a mile.&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Triathlete</span><span class="p">(</span><span class="n">Swimmer</span><span class="p">,</span> <span class="n">Runner</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Single Inheritance:&quot;</span><span class="p">)</span>
+<span class="n">mgr</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">()</span>
+<span class="n">mgr</span><span class="o">.</span><span class="n">introduce</span><span class="p">()</span>
+<span class="n">mgr</span><span class="o">.</span><span class="n">lead_team</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Multilevel Inheritance:&quot;</span><span class="p">)</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">SportsCar</span><span class="p">()</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">start_engine</span><span class="p">()</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">drive</span><span class="p">()</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">turbo_boost</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Multiple Inheritance:&quot;</span><span class="p">)</span>
+<span class="n">athlete</span> <span class="o">=</span> <span class="n">Triathlete</span><span class="p">()</span>
+<span class="n">athlete</span><span class="o">.</span><span class="n">swim</span><span class="p">()</span>
+<span class="n">athlete</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[3]:</div>
+          <div class="io-body"><pre>Single Inheritance:
+I work here.
+I lead a small team.
+
+Multilevel Inheritance:
+Engine started.
+Driving on the road.
+Turbo engaged!
+
+Multiple Inheritance:
+Swimming laps.
+Running a mile.
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 4</p>
+        <h3 id="task-4">Task 4 — Method Overriding</h3>
+        <p>A child class replaces the parent's implementation while keeping the same
+method name.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [4]:</div>
+            <div class="io-body"><pre><span class="k">class</span><span class="w"> </span><span class="nc">Shape</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is some kind of shape.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Circle</span><span class="p">(</span><span class="n">Shape</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is a circle.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">3.14159</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<span class="n">generic</span> <span class="o">=</span> <span class="n">Shape</span><span class="p">()</span>
+<span class="n">disc</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">generic</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generic area:&quot;</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">area</span><span class="p">())</span>
+
+<span class="n">disc</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Circle area:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">disc</span><span class="o">.</span><span class="n">area</span><span class="p">(),</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[4]:</div>
+          <div class="io-body"><pre>This is some kind of shape.
+Generic area: 0
+This is a circle.
+Circle area: 113.1
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 5</p>
+        <h3 id="task-5">Task 5 — Operator Overloading with a Vector Class</h3>
+        <p>Overloading <code>__add__</code> lets <code>+</code> combine two <code>Vector2D</code> objects component-wise,
+just like the requested <code>Point</code> example (renamed here to <code>Vector2D</code> to keep
+the demo distinct).</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [5]:</div>
+            <div class="io-body"><pre><span class="k">class</span><span class="w"> </span><span class="nc">Vector2D</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="n">Vector2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Vector2D(x=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="si">}</span><span class="s2">, y=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+
+<span class="n">v1</span> <span class="o">=</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span>
+<span class="n">v3</span> <span class="o">=</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">v2</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;v1:&quot;</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;v2:&quot;</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;v1 + v2:&quot;</span><span class="p">,</span> <span class="n">v3</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[5]:</div>
+          <div class="io-body"><pre>v1: Vector2D(x=14, y=9)
+v2: Vector2D(x=6, y=23)
+v1 + v2: Vector2D(x=20, y=32)
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="pitfalls">Common pitfalls</h2>
+    <div class="pitfalls"><div class="pitfall"><b>Forgetting <code>self</code></b><span>Every method's first parameter is <code>self</code>, and every attribute needs the <code>self.</code> prefix inside the class.</span></div><div class="pitfall"><b>Class attributes shared unintentionally</b><span>Variables set outside <code>__init__</code> are shared by <em>all</em> instances. Per-object data belongs in <code>__init__</code>.</span></div><div class="pitfall"><b>Confusing the class with an object</b><span><code>Student</code> is the blueprint; <code>Student(...)</code> builds one. Calling methods on the class itself fails.</span></div><div class="pitfall"><b>Deep inheritance chains</b><span>Five levels of subclassing is usually a sign the design needs rethinking, not another layer.</span></div></div>
+
+    <nav class="chapnav"><a href="experiment-8.html"><small>Previous</small><b>Files and Failures</b></a><a class="next" href="experiment-10.html"><small>Next</small><b>From Numbers to Insight</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Experiment 09 · Objects — Modelling the World</span>
+  <span><a href="index.html">All ten experiments</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+</body>
+</html>

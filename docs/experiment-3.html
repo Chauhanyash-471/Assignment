@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03. Making Decisions — Python Programming Lab</title>
+<meta name="description" content="Branching, boolean logic, and choosing one path out of many">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> All experiments</span></a>
+    <span class="sep">/</span>
+    <span class="now">Experiment 03</span>
+    <span class="spacer"></span>
+    <span class="progress" title="3 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="progress-num">3/10</span>
+  </div>
+</div>
+
+<header class="chead wrap">
+  <p class="eyebrow">Experiment 03 · Beginner</p>
+  <h1>Making Decisions</h1>
+  <p class="sub">Branching, boolean logic, and choosing one path out of many</p>
+  <blockquote class="pullquote">Straight-line code can only ever do one thing. Conditionals let a program respond.</blockquote>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="On this page">
+    <a href="#idea">The big idea</a>
+    <a href="#works">How it works</a>
+    <a href="#tasks">The tasks</a>
+    <a href="#pitfalls">Pitfalls</a>
+  </nav>
+
+  <main class="prose">
+    <h2 id="idea">The big idea</h2>
+    <p>So far every program has run top to bottom, every line, every time. Real programs need to <em>choose</em>:
+show a pass message or a fail message, take the leap-year path or the ordinary one, warn the user or
+proceed quietly.</p>
+<p>The <code>if</code> statement is how Python chooses. It evaluates a <strong>condition</strong> — any expression that produces
+<code>True</code> or <code>False</code> — and runs the indented block underneath only when that condition holds.</p>
+<p>The critical detail, and the one that makes an <code>if</code> / <code>elif</code> / <code>elif</code> / <code>else</code> chain different from
+several separate <code>if</code> statements, is that <strong>at most one branch in a chain ever runs</strong>. Python tests
+each condition in order, takes the first that is <code>True</code>, executes it, and skips everything else in the
+chain. Separate <code>if</code> statements are all tested independently, so several can fire.</p>
+<p>Python is also unusual in that <strong>indentation is the syntax</strong>. There are no braces marking a block —
+the whitespace itself defines what belongs inside the <code>if</code>. This is why Python code from different
+people looks so similar, and why a stray space can change a program's meaning.</p>
+
+    <figure class="figure reveal">
+      <img src="assets/ch3.png" alt="An if / elif / else chain: Python takes the first true branch and skips the rest.">
+      <figcaption>An if / elif / else chain: Python takes the first true branch and skips the rest.</figcaption>
+    </figure>
+
+    <h2 id="works">How it works</h2>
+    <h3>Comparison and logical operators</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Question it asks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>==</code> <code>!=</code></td>
+<td>are these equal / not equal?</td>
+</tr>
+<tr>
+<td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td>
+<td>ordering comparisons</td>
+</tr>
+<tr>
+<td><code>and</code></td>
+<td>are <strong>both</strong> sides true?</td>
+</tr>
+<tr>
+<td><code>or</code></td>
+<td>is <strong>either</strong> side true?</td>
+</tr>
+<tr>
+<td><code>not</code></td>
+<td>flip the truth value</td>
+</tr>
+</tbody>
+</table>
+<p>Python allows <strong>chained comparisons</strong> that read like mathematics: <code>if 0 &lt;= score &lt;= 100:</code> is valid and
+means exactly what it looks like.</p>
+<h3>Short-circuit evaluation</h3>
+<p><code>and</code> stops as soon as it meets a <code>False</code>; <code>or</code> stops at the first <code>True</code>. This is not just an
+optimisation — it lets you write safe guards:</p>
+<pre><code class="language-python">if len(items) &gt; 0 and items[0] == &quot;x&quot;:   # the second test never runs on an empty list
+</code></pre>
+<h3>Truthiness</h3>
+<p>Any value can be used as a condition. Empty things (<code>0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>) count as <code>False</code>;
+everything else counts as <code>True</code>. So <code>if names:</code> is the idiomatic way to say "if the list has anything
+in it".</p>
+<h3>When a chain gets too long</h3>
+<p>Once you have six or seven branches all mapping a value to a result — grade bands being the classic
+case — a long <code>elif</code> ladder becomes hard to read and easy to break. A <strong>lookup table</strong> (a list of
+ranges, or a dictionary) separates the <em>data</em> from the <em>logic</em>, so adding a new band means editing one
+line of data rather than surgery on control flow. Experiment 3 finishes with exactly that refactor.</p>
+
+    <h2 id="tasks">The tasks</h2>
+    <p>Everything above was theory. What follows is the lab work — each task stated,
+       explained, then solved with code that really ran.</p>
+    
+      <section class="task reveal">
+        <p class="task-label">Task 1</p>
+        <h3 id="task-1">Task 1 — Divisible by Both 3 and 5?</h3>
+        
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [1]:</div>
+            <div class="io-body"><pre><span class="n">check_num</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">divisible_both</span> <span class="o">=</span> <span class="n">check_num</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">check_num</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">check_num</span><span class="si">}</span><span class="s2"> divisible by both 3 and 5? -&gt; </span><span class="si">{</span><span class="n">divisible_both</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[1]:</div>
+          <div class="io-body"><pre>60 divisible by both 3 and 5? -&gt; True
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 2</p>
+        <h3 id="task-2">Task 2 — Multiple of 5?</h3>
+        
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [2]:</div>
+            <div class="io-body"><pre><span class="n">check_num2</span> <span class="o">=</span> <span class="mi">44</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">check_num2</span><span class="si">}</span><span class="s2"> is a multiple of 5&quot;</span> <span class="k">if</span> <span class="n">check_num2</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">check_num2</span><span class="si">}</span><span class="s2"> is not a multiple of 5&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[2]:</div>
+          <div class="io-body"><pre>44 is not a multiple of 5
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 3</p>
+        <h3 id="task-3">Task 3 — Larger of Two Numbers (or Equal)</h3>
+        
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [3]:</div>
+            <div class="io-body"><pre><span class="n">val_x</span><span class="p">,</span> <span class="n">val_y</span> <span class="o">=</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">21</span>
+
+<span class="k">if</span> <span class="n">val_x</span> <span class="o">==</span> <span class="n">val_y</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numbers are equal&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">val_x</span> <span class="o">&gt;</span> <span class="n">val_y</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greatest number is&quot;</span><span class="p">,</span> <span class="n">val_x</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greatest number is&quot;</span><span class="p">,</span> <span class="n">val_y</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[3]:</div>
+          <div class="io-body"><pre>numbers are equal
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 4</p>
+        <h3 id="task-4">Task 4 — Largest of Three Distinct Numbers</h3>
+        <p>Using <code>max()</code> keeps this compact, but the logic is the same three-way
+comparison under the hood.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [4]:</div>
+            <div class="io-body"><pre><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">58</span>
+<span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greatest number is&quot;</span><span class="p">,</span> <span class="n">largest</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[4]:</div>
+          <div class="io-body"><pre>Greatest number is 91
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 5</p>
+        <h3 id="task-5">Task 5 — Real or Imaginary Roots of a Quadratic</h3>
+        <p><code>ax^2 + bx + c = 0</code>. The discriminant's sign tells us whether roots are
+real or complex; <code>cmath</code> handles both cases uniformly.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [5]:</div>
+            <div class="io-body"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">cmath</span>
+
+<span class="n">coef_a</span><span class="p">,</span> <span class="n">coef_b</span><span class="p">,</span> <span class="n">coef_c</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span>
+
+<span class="n">disc</span> <span class="o">=</span> <span class="n">coef_b</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">coef_a</span> <span class="o">*</span> <span class="n">coef_c</span>
+<span class="n">r1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">coef_b</span> <span class="o">+</span> <span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">disc</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">coef_a</span><span class="p">)</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">coef_b</span> <span class="o">-</span> <span class="n">cmath</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">disc</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">coef_a</span><span class="p">)</span>
+
+<span class="n">nature</span> <span class="o">=</span> <span class="s2">&quot;real&quot;</span> <span class="k">if</span> <span class="n">disc</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;imaginary&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Discriminant = </span><span class="si">{</span><span class="n">disc</span><span class="si">}</span><span class="s2"> -&gt; roots are </span><span class="si">{</span><span class="n">nature</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Root 1:&quot;</span><span class="p">,</span> <span class="n">r1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Root 2:&quot;</span><span class="p">,</span> <span class="n">r2</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[5]:</div>
+          <div class="io-body"><pre>Discriminant = -40 -&gt; roots are imaginary
+Root 1: (-1+1.5811388300841898j)
+Root 2: (-1-1.5811388300841898j)
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 6</p>
+        <h3 id="task-6">Task 6 — Leap Year Test</h3>
+        <p>A year is a leap year if divisible by 4, except centuries, unless also
+divisible by 400.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [6]:</div>
+            <div class="io-body"><pre><span class="n">check_year</span> <span class="o">=</span> <span class="mi">2100</span>
+
+<span class="n">is_leap</span> <span class="o">=</span> <span class="p">(</span><span class="n">check_year</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">check_year</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">check_year</span> <span class="o">%</span> <span class="mi">400</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">check_year</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="s1">&#39;Leap year&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">is_leap</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Not a leap year&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[6]:</div>
+          <div class="io-body"><pre>2100 -&gt; Not a leap year
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 7</p>
+        <h3 id="task-7">Task 7 — Tomorrow&#x27;s Date</h3>
+        <p>Adding a single <code>timedelta(days=1)</code> to any <code>date</code> object handles month/year
+rollover automatically.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [7]:</div>
+            <div class="io-body"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="n">given_date</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">28</span><span class="p">)</span>
+<span class="n">tomorrow</span> <span class="o">=</span> <span class="n">given_date</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Given date :&quot;</span><span class="p">,</span> <span class="n">given_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next date  :&quot;</span><span class="p">,</span> <span class="n">tomorrow</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[7]:</div>
+          <div class="io-body"><pre>Given date : 28-02-2024
+Next date  : 29-02-2024
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 8</p>
+        <h3 id="task-8">Task 8 — Grade Sheet from Five Subject Marks</h3>
+        <p>Percentage feeds a CGPA, and the CGPA is mapped to a letter grade through a
+small lookup table of <code>(low, high, label)</code> ranges instead of a long
+if/elif chain.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [8]:</div>
+            <div class="io-body"><pre><span class="k">def</span><span class="w"> </span><span class="nf">cgpa_to_grade</span><span class="p">(</span><span class="n">cgpa_value</span><span class="p">):</span>
+    <span class="n">grade_bands</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="s2">&quot;C+&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">5.1</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">6.1</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="s2">&quot;B+&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">7.1</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">8.1</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="s2">&quot;A+&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mf">9.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="s2">&quot;O (Outstanding)&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">grade_bands</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">cgpa_value</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="s2">&quot;Invalid CGPA&quot;</span>
+
+
+<span class="n">learner_name</span> <span class="o">=</span> <span class="s2">&quot;Ananya Iyer&quot;</span>
+<span class="n">roll_number</span>  <span class="o">=</span> <span class="s2">&quot;R19834210&quot;</span>
+<span class="n">sap_number</span>   <span class="o">=</span> <span class="s2">&quot;50008841&quot;</span>
+<span class="n">sem_no</span>       <span class="o">=</span> <span class="mi">2</span>
+<span class="n">degree_name</span>  <span class="o">=</span> <span class="s2">&quot;B.Tech. CSE (Data Science)&quot;</span>
+
+<span class="n">subject_marks</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Programming&quot;</span><span class="p">:</span>  <span class="mi">85</span><span class="p">,</span>
+    <span class="s2">&quot;Mathematics&quot;</span><span class="p">:</span>  <span class="mi">76</span><span class="p">,</span>
+    <span class="s2">&quot;Physics&quot;</span><span class="p">:</span>      <span class="mi">69</span><span class="p">,</span>
+    <span class="s2">&quot;Communication&quot;</span><span class="p">:</span><span class="mi">88</span><span class="p">,</span>
+    <span class="s2">&quot;Statistics&quot;</span><span class="p">:</span>   <span class="mi">91</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">marks_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">subject_marks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">marks_pct</span>   <span class="o">=</span> <span class="n">marks_total</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subject_marks</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">cgpa_score</span>  <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">marks_pct</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">final_grade</span> <span class="o">=</span> <span class="n">cgpa_to_grade</span><span class="p">(</span><span class="n">cgpa_score</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Gradesheet ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Name:&quot;</span><span class="p">,</span> <span class="n">learner_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Roll No:&quot;</span><span class="p">,</span> <span class="n">roll_number</span><span class="p">,</span> <span class="s2">&quot;| SAP ID:&quot;</span><span class="p">,</span> <span class="n">sap_number</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Semester:&quot;</span><span class="p">,</span> <span class="n">sem_no</span><span class="p">,</span> <span class="s2">&quot;| Programme:&quot;</span><span class="p">,</span> <span class="n">degree_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Subject-wise Marks:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">subject</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">subject_marks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">subject</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Percentage: </span><span class="si">{</span><span class="n">marks_pct</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CGPA:&quot;</span><span class="p">,</span> <span class="n">cgpa_score</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Grade:&quot;</span><span class="p">,</span> <span class="n">final_grade</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[8]:</div>
+          <div class="io-body"><pre>=== Gradesheet ===
+Name: Ananya Iyer
+Roll No: R19834210 | SAP ID: 50008841
+Semester: 2 | Programme: B.Tech. CSE (Data Science)
+
+Subject-wise Marks:
+  Programming: 85
+  Mathematics: 76
+  Physics: 69
+  Communication: 88
+  Statistics: 91
+
+Percentage: 81.80%
+CGPA: 8.2
+Grade: A+
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="pitfalls">Common pitfalls</h2>
+    <div class="pitfalls"><div class="pitfall"><b>Inconsistent indentation</b><span>Mixing tabs and spaces raises <code>IndentationError</code>. Pick spaces (four of them) and let your editor enforce it.</span></div><div class="pitfall"><b><code>if x = 5:</code></b><span>Assignment inside a plain <code>if</code> condition is a syntax error. You want <code>==</code>.</span></div><div class="pitfall"><b>Overlapping or gapped ranges</b><span>Grade bands like <code>&lt;= 5.0</code> then <code>&gt;= 5.1</code> silently ignore <code>5.05</code>. Design boundaries deliberately.</span></div><div class="pitfall"><b>Redundant <code>== True</code></b><span><code>if is_valid == True:</code> works but <code>if is_valid:</code> is clearer and idiomatic.</span></div></div>
+
+    <nav class="chapnav"><a href="experiment-2.html"><small>Previous</small><b>Reading Input and Wielding Operators</b></a><a class="next" href="experiment-4.html"><small>Next</small><b>Repetition Without Repeating Yourself</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Experiment 03 · Making Decisions</span>
+  <span><a href="index.html">All ten experiments</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+</body>
+</html>

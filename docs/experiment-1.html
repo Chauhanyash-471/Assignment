@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01. Getting Python Off the Ground — Python Programming Lab</title>
+<meta name="description" content="Installation, the two ways to run code, and your first values">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> All experiments</span></a>
+    <span class="sep">/</span>
+    <span class="now">Experiment 01</span>
+    <span class="spacer"></span>
+    <span class="progress" title="1 of 10"><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="progress-num">1/10</span>
+  </div>
+</div>
+
+<header class="chead wrap">
+  <p class="eyebrow">Experiment 01 · Beginner</p>
+  <h1>Getting Python Off the Ground</h1>
+  <p class="sub">Installation, the two ways to run code, and your first values</p>
+  <blockquote class="pullquote">Every program you will ever write starts the same way: a value, a name for it, and a way to see it.</blockquote>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="On this page">
+    <a href="#idea">The big idea</a>
+    <a href="#works">How it works</a>
+    <a href="#tasks">The tasks</a>
+    <a href="#pitfalls">Pitfalls</a>
+  </nav>
+
+  <main class="prose">
+    <h2 id="idea">The big idea</h2>
+    <p>Before Python can do anything interesting, two things have to be true: the interpreter has to be
+installed, and you have to know <em>how</em> you are talking to it. Those sound like trivia, but they
+shape everything that follows.</p>
+<p>Python is an <strong>interpreted</strong> language. There is no separate "build" step that turns your file into
+an application — instead, a program called the interpreter reads your code and carries out each
+instruction as it encounters it. That single design decision is why Python feels so immediate:
+you can type an expression and get an answer back before you have finished your coffee.</p>
+<p>That immediacy comes in two flavours. In <strong>interactive mode</strong> you get a prompt (<code>&gt;&gt;&gt;</code>), you type one
+statement, and Python answers straight away. It is a conversation. In <strong>script mode</strong> you write your
+statements into a <code>.py</code> file and hand the whole file over at once. It is a letter rather than a
+conversation — slower to get feedback, but the work is saved, repeatable, and shareable.</p>
+<p>Beginners often treat these as competing options. They are not. Experienced programmers move between
+them constantly: prototype a tricky line interactively, then paste the version that works into the
+script. This first experiment gets you comfortable with both.</p>
+
+    <figure class="figure reveal">
+      <img src="assets/ch1.png" alt="Two ways to talk to the interpreter — a conversation, or a letter.">
+      <figcaption>Two ways to talk to the interpreter — a conversation, or a letter.</figcaption>
+    </figure>
+
+    <h2 id="works">How it works</h2>
+    <h3>Values, names, and the assignment operator</h3>
+<p>A <strong>value</strong> is a piece of data — the number <code>42</code>, the text <code>"Python"</code>, the truth value <code>True</code>.
+A <strong>variable</strong> is a name that refers to a value. In Python the <code>=</code> sign performs <em>assignment</em>,
+not mathematical equality:</p>
+<pre><code class="language-python">count = 10        # &quot;let the name count refer to the value 10&quot;
+count = count + 1 # perfectly sensible as assignment; nonsense as algebra
+</code></pre>
+<p>Python figures out the type for you — you never declare <code>int count</code>. This is called <strong>dynamic typing</strong>.
+The type belongs to the <em>value</em>, not to the name, which is why a name can be pointed at a number
+today and a string tomorrow.</p>
+<h3>The five types you meet first</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Example</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code></td>
+<td><code>42</code></td>
+<td>whole numbers, no size limit in Python</td>
+</tr>
+<tr>
+<td><code>float</code></td>
+<td><code>2.718</code></td>
+<td>numbers with a decimal point</td>
+</tr>
+<tr>
+<td><code>str</code></td>
+<td><code>"Python"</code></td>
+<td>text, in single or double quotes</td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td><code>True</code> / <code>False</code></td>
+<td>one of exactly two truth values</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td><code>[10, 20, 30]</code></td>
+<td>an ordered, changeable collection</td>
+</tr>
+</tbody>
+</table>
+<h3>Getting text onto the screen</h3>
+<p><code>print()</code> is a <strong>function</strong> — a named piece of behaviour you <em>call</em> by putting parentheses after it.
+Give it several values separated by commas and it prints them with a space between each.</p>
+<p>Special characters inside strings are written with a backslash: <code>\n</code> starts a new line, <code>\t</code> inserts
+a tab, and <code>\\</code> means "an actual backslash". This is why a Windows path or a date written with
+backslashes needs care.</p>
+<p>The most readable way to build a sentence out of variables is the <strong>f-string</strong> — put <code>f</code> before the
+opening quote and wrap any expression in braces:</p>
+<pre><code class="language-python">print(f&quot;{first} ({alias}) {last}&quot;)
+</code></pre>
+
+    <h2 id="tasks">The tasks</h2>
+    <p>Everything above was theory. What follows is the lab work — each task stated,
+       explained, then solved with code that really ran.</p>
+    
+      <section class="task reveal">
+        <p class="task-label">Task 1</p>
+        <h3 id="task-1">Task 1 — Interactive Mode vs. Script Mode</h3>
+        <p><strong>Interactive (REPL) mode:</strong> you type one line, hit Enter, and Python answers
+immediately — great for testing a quick idea.</p>
+<p><strong>Script mode:</strong> you write a <code>.py</code> file with many lines and run the whole thing
+in one go — better once a program grows beyond a few lines.</p>
+<p>The cell below simply confirms the interpreter is alive and reports its version,
+the way you'd sanity-check any fresh install.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [1]:</div>
+            <div class="io-body"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">platform</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Interpreter check -&gt;&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_implementation</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Version string     -&gt;&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ready to code.&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[1]:</div>
+          <div class="io-body"><pre>Interpreter check -&gt; CPython
+Version string     -&gt; 3.12.3
+Ready to code.
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 2</p>
+        <h3 id="task-2">Task 2 — Printing Strings in Different Shapes</h3>
+        <p>Same word, four different presentations: a single line, two separate lines,
+one line broken by a newline character, and a line containing an escaped
+backslash (dates are a classic place this trips people up).</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [2]:</div>
+            <div class="io-body"><pre><span class="c1"># (a) one clean line</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Greetings, everyone !!!&quot;</span><span class="p">)</span>
+
+<span class="c1"># (b) two separate print calls</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;World&quot;</span><span class="p">)</span>
+
+<span class="c1"># (c) a single string holding an embedded newline</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello</span><span class="se">\n</span><span class="s2">World&quot;</span><span class="p">)</span>
+
+<span class="c1"># (d) escaping a backslash inside a date string</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rohit&#39;s date of birth is 12</span><span class="se">\\</span><span class="s2">05</span><span class="se">\\</span><span class="s2">1999&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[2]:</div>
+          <div class="io-body"><pre>Greetings, everyone !!!
+Hello
+World
+Hello
+World
+Rohit&#x27;s date of birth is 12\05\1999
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 3</p>
+        <h3 id="task-3">Task 3 — A String Variable Round-Trip</h3>
+        <p>Store a word in a variable, then hand it straight to <code>print</code>.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [3]:</div>
+            <div class="io-body"><pre><span class="n">greeting_word</span> <span class="o">=</span> <span class="s2">&quot;Hello&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">greeting_word</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[3]:</div>
+          <div class="io-body"><pre>Hello
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 4</p>
+        <h3 id="task-4">Task 4 — Sampling Python&#x27;s Built-in Data Types</h3>
+        <p>Five different kinds of values, one line each, so the type diversity is
+visible at a glance.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [4]:</div>
+            <div class="io-body"><pre><span class="n">whole_number</span>   <span class="o">=</span> <span class="mi">42</span>
+<span class="n">decimal_number</span> <span class="o">=</span> <span class="mf">2.718</span>
+<span class="n">word</span>           <span class="o">=</span> <span class="s2">&quot;Python&quot;</span>
+<span class="n">flag</span>           <span class="o">=</span> <span class="kc">False</span>
+<span class="n">basket</span>         <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;int    -&gt;&quot;</span><span class="p">,</span> <span class="n">whole_number</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;float  -&gt;&quot;</span><span class="p">,</span> <span class="n">decimal_number</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;str    -&gt;&quot;</span><span class="p">,</span> <span class="n">word</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;bool   -&gt;&quot;</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;list   -&gt;&quot;</span><span class="p">,</span> <span class="n">basket</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[4]:</div>
+          <div class="io-body"><pre>int    -&gt; 42
+float  -&gt; 2.718
+str    -&gt; Python
+bool   -&gt; False
+list   -&gt; [10, 20, 30]
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 5</p>
+        <h3 id="task-5">Task 5 — Building a Full Name from Two Pieces</h3>
+        <p>Two variables hold a given name and a family name; string concatenation
+joins them with a space in between.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [5]:</div>
+            <div class="io-body"><pre><span class="n">given_name</span>  <span class="o">=</span> <span class="s2">&quot;Arjun&quot;</span>
+<span class="n">family_name</span> <span class="o">=</span> <span class="s2">&quot;Kapoor&quot;</span>
+<span class="n">combined</span>    <span class="o">=</span> <span class="n">given_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">family_name</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Full Name:&quot;</span><span class="p">,</span> <span class="n">combined</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[5]:</div>
+          <div class="io-body"><pre>Full Name: Arjun Kapoor
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 6</p>
+        <h3 id="task-6">Task 6 — Name, Nickname, Surname in One Line</h3>
+        <p>Format target: <code>FirstName (Nickname) LastName</code>, built here with an f-string.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [6]:</div>
+            <div class="io-body"><pre><span class="n">first</span>  <span class="o">=</span> <span class="s2">&quot;Abraham&quot;</span>
+<span class="n">last</span>   <span class="o">=</span> <span class="s2">&quot;Lincoln&quot;</span>
+<span class="n">alias</span>  <span class="o">=</span> <span class="s2">&quot;Honest Abe&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">first</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="n">last</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[6]:</div>
+          <div class="io-body"><pre>Abraham (Honest Abe) Lincoln
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="task reveal">
+        <p class="task-label">Task 7</p>
+        <h3 id="task-7">Task 7 — A Personal Details Card</h3>
+        <p>A small "identity card" printed field by field — swap in your own details
+and re-run.</p>
+        <div class="io">
+          <div class="io-row">
+            <div class="io-gutter">In [7]:</div>
+            <div class="io-body"><pre><span class="n">student_name</span>    <span class="o">=</span> <span class="s2">&quot;PRIYA MEHTA&quot;</span>
+<span class="n">sap_number</span>      <span class="o">=</span> <span class="s2">&quot;500071122&quot;</span>
+<span class="n">birth_date</span>      <span class="o">=</span> <span class="s2">&quot;04 Feb 2000&quot;</span>
+<span class="n">addr_line_one</span>   <span class="o">=</span> <span class="s2">&quot;UPES&quot;</span>
+<span class="n">addr_line_two</span>   <span class="o">=</span> <span class="s2">&quot;Bidholi Campus&quot;</span>
+<span class="n">postal_code</span>     <span class="o">=</span> <span class="s2">&quot;248007&quot;</span>
+<span class="n">degree_program</span>  <span class="o">=</span> <span class="s2">&quot;Data Science&quot;</span>
+<span class="n">current_sem</span>     <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">card</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="n">student_name</span><span class="p">,</span>
+    <span class="s2">&quot;SAP ID&quot;</span><span class="p">:</span> <span class="n">sap_number</span><span class="p">,</span>
+    <span class="s2">&quot;DATE OF BIRTH&quot;</span><span class="p">:</span> <span class="n">birth_date</span><span class="p">,</span>
+    <span class="s2">&quot;Pincode&quot;</span><span class="p">:</span> <span class="n">postal_code</span><span class="p">,</span>
+    <span class="s2">&quot;Programme&quot;</span><span class="p">:</span> <span class="n">degree_program</span><span class="p">,</span>
+    <span class="s2">&quot;Semester&quot;</span><span class="p">:</span> <span class="n">current_sem</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ADDRESS:&quot;</span><span class="p">,</span> <span class="n">addr_line_one</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">addr_line_two</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">card</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="io-row output">
+          <div class="io-gutter out">Out[7]:</div>
+          <div class="io-body"><pre>ADDRESS: UPES
+Bidholi Campus
+NAME: PRIYA MEHTA
+SAP ID: 500071122
+DATE OF BIRTH: 04 Feb 2000
+Pincode: 248007
+Programme: Data Science
+Semester: 2
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="pitfalls">Common pitfalls</h2>
+    <div class="pitfalls"><div class="pitfall"><b>Using <code>=</code> when you mean <code>==</code></b><span><code>=</code> assigns a value; <code>==</code> asks whether two values are equal. Mixing them up is the single most common beginner bug.</span></div><div class="pitfall"><b>Forgetting quotes around text</b><span><code>print(Hello)</code> looks for a <em>variable</em> named Hello and fails. <code>print("Hello")</code> prints the word.</span></div><div class="pitfall"><b>Backslashes vanishing</b><span><code>"12\05\1999"</code> — Python reads <code>\0</code> as an escape code. Write <code>\\</code> for a literal backslash, or use a raw string <code>r"..."</code>.</span></div><div class="pitfall"><b>Assuming <code>print</code> returns something</b><span><code>print()</code> displays a value and returns <code>None</code>. <code>x = print(5)</code> leaves <code>x</code> empty.</span></div></div>
+
+    <nav class="chapnav"><a class="disabled" aria-hidden="true"><small>Previous</small><b>—</b></a><a class="next" href="experiment-2.html"><small>Next</small><b>Reading Input and Wielding Operators</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Experiment 01 · Getting Python Off the Ground</span>
+  <span><a href="index.html">All ten experiments</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+</body>
+</html>
