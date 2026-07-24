@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trial 05: Word-Weaving &amp; Set Sorcery — Reincarnated as a Pythonist</title>
+<meta name="description" content="Text bends like thread. Collections learn to know themselves.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/isekai.css">
+</head>
+<body data-role="trial" data-trial-n="5">
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> Status Window</span></a>
+    <span class="sep">/</span>
+    <span class="now">Trial 05</span>
+    <span class="spacer"></span>
+    <span class="mini-hud hud" id="mini-hud">LV. 0 · Vibhu HP 100%</span>
+    <span class="pips" title="5 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="pips-num hud">5/10</span>
+  </div>
+</div>
+
+<header class="thead wrap" style="--rc:#e11d48">
+  <div class="rankline">
+    <span class="rank rank-C">C</span>
+    <span class="trialno">Trial 05 of 10</span>
+  </div>
+  <h1>Word-Weaving &amp; Set Sorcery</h1>
+  <p class="realname">a.k.a. Text and Sets — Working with strings, and the collection built for comparison</p>
+
+  <img class="trial-banner" src="assets/img/power-05.jpg" alt="Rising power">
+  <div class="sysmsg">
+    <span class="sys-label">SYSTEM MESSAGE</span>
+    <p>Two new arts reveal themselves at once: the weaving of words into new shapes, and the sorcery of sets that compare their contents in a glance.</p>
+  </div>
+</header>
+
+<div class="wrap layout" style="--rc:#e11d48">
+  <nav class="toc" aria-label="On this page">
+    <a href="#lore">Lore</a>
+    <a href="#codex">Codex</a>
+    <a href="#trials">Trials</a>
+    <a href="#backlash">Backlash</a>
+  </nav>
+
+  <main class="prose" style="--rc:#e11d48">
+    <h2 id="lore">Lore</h2>
+    <p>Strings are the format the world hands you data in: names, addresses, log lines, CSV rows, web pages.
+Python treats a string as an ordered <strong>sequence of characters</strong>, which means everything you know about
+positions and slicing applies directly.</p>
+<p>Two properties matter most. First, strings are <strong>indexed</strong> — <code>s[0]</code> is the first character, and
+negative indices count from the end, so <code>s[-1]</code> is the last one without needing to know the length.
+Second, strings are <strong>immutable</strong>: you cannot change a character in place. Every "modification" —
+<code>.upper()</code>, <code>.replace()</code>, <code>.strip()</code> — returns a <em>brand new string</em> and leaves the original untouched.
+Forgetting this produces code that looks right and does nothing.</p>
+<p>Sets come from a different direction entirely. A <strong>set</strong> is an unordered collection with no duplicates,
+and its superpower is comparison. Asking "which items appear in both of these lists?" with loops takes
+a nested pass; with sets it is a single <code>&amp;</code>. Removing duplicates from a list is <code>set(items)</code>. Checking
+membership in a large collection is dramatically faster in a set than a list, because sets are built on
+hashing rather than scanning.</p>
+
+    <div class="emblem-banner reveal" style="--rc:#e11d48"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="40" cy="50" r="26" fill="none" stroke="currentColor" stroke-width="4" opacity=".85"/>
+  <circle cx="64" cy="50" r="26" fill="none" stroke="currentColor" stroke-width="4" opacity=".55"/>
+  <line x1="30" y1="42" x2="46" y2="42" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+  <line x1="30" y1="50" x2="42" y2="50" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+  <line x1="30" y1="58" x2="46" y2="58" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+</svg></div>
+
+    <h2 id="codex">Codex</h2>
+    <h3>Slicing</h3>
+<p><code>s[start:stop:step]</code> — <code>stop</code> is excluded, any part can be omitted:</p>
+<pre><code class="language-python">s = &quot;PYTHON&quot;
+s[0]      # 'P'        first character
+s[-1]     # 'N'        last character
+s[1:4]    # 'YTH'      positions 1, 2, 3
+s[::-1]   # 'NOHTYP'   the whole thing, backwards
+</code></pre>
+<p>That last one — <code>[::-1]</code> — is the standard Python idiom for reversing, and it is why the palindrome
+check in Experiment 4 is a single line.</p>
+<h3>String methods worth memorising</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.upper()</code> / <code>.lower()</code></td>
+<td>change case (returns a new string)</td>
+</tr>
+<tr>
+<td><code>.strip()</code></td>
+<td>remove leading/trailing whitespace</td>
+</tr>
+<tr>
+<td><code>.split()</code></td>
+<td>break into a list on whitespace or a separator</td>
+</tr>
+<tr>
+<td><code>.join(list)</code></td>
+<td>the reverse — glue a list into one string</td>
+</tr>
+<tr>
+<td><code>.find(sub)</code></td>
+<td>position of a substring, or <code>-1</code></td>
+</tr>
+<tr>
+<td><code>.count(sub)</code></td>
+<td>how many <strong>non-overlapping</strong> occurrences</td>
+</tr>
+</tbody>
+</table>
+<p>That word <em>non-overlapping</em> is why Experiment 5 counts occurrences manually: <code>"ABABAB".count("ABA")</code>
+returns <code>1</code>, but there are genuinely two overlapping matches. When overlaps matter, scan with <code>.find()</code>
+advancing the start by one each time.</p>
+<h3>Set algebra</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\|</code></td>
+<td>union — everything in either</td>
+</tr>
+<tr>
+<td><code>&amp;</code></td>
+<td>intersection — only what is in both</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>difference — in the left, not the right</td>
+</tr>
+<tr>
+<td><code>^</code></td>
+<td>symmetric difference — in one but not both</td>
+</tr>
+</tbody>
+</table>
+<h3><code>Counter</code> — tallying done for you</h3>
+<p><code>collections.Counter</code> takes any sequence and returns how many times each item appeared. It replaces the
+familiar "make an empty dict, loop, <code>get(key, 0) + 1</code>" pattern with a single line.</p>
+
+    <h2 id="trials">The trials</h2>
+    <p>Lore is only theory. Each trial below must be cast and cleared —
+       objective stated, spell cast, result confirmed.</p>
+    
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.1</p>
+        <h3 id="task-1">Task 1 — Counting Capital Letters</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[1]</div>
+            <div class="scroll-body"><pre><span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;DataScience WITH python 2026&quot;</span>
+<span class="n">capital_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">line</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Capital letters found:&quot;</span><span class="p">,</span> <span class="n">capital_count</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[1]</div>
+          <div class="scroll-body"><pre>Capital letters found: 6
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.2</p>
+        <h3 id="task-2">Task 2 — Counting Vowels</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[2]</div>
+            <div class="scroll-body"><pre><span class="n">passage</span> <span class="o">=</span> <span class="s2">&quot;Loops and strings pair nicely together&quot;</span>
+<span class="n">vowel_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s2">&quot;aeiouAEIOU&quot;</span><span class="p">)</span>
+<span class="n">vowel_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">passage</span> <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">vowel_set</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total vowels:&quot;</span><span class="p">,</span> <span class="n">vowel_count</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[2]</div>
+          <div class="scroll-body"><pre>Total vowels: 11
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.3</p>
+        <h3 id="task-3">Task 3 — One Word Per Line</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[3]</div>
+            <div class="scroll-body"><pre><span class="n">line_to_split</span> <span class="o">=</span> <span class="s2">&quot;consistent practice builds real fluency&quot;</span>
+<span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">line_to_split</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[3]</div>
+          <div class="scroll-body"><pre>consistent
+practice
+builds
+real
+fluency
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.4</p>
+        <h3 id="task-4">Task 4 — Counting Substring Occurrences (Overlapping Allowed)</h3>
+        <p><code>str.count()</code> only counts non-overlapping matches, so a manual scan is used
+to also catch overlapping ones, moving the search start by just 1 each time.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[4]</div>
+            <div class="scroll-body"><pre><span class="n">haystack</span> <span class="o">=</span> <span class="s2">&quot;ABABABAB&quot;</span>
+<span class="n">needle</span> <span class="o">=</span> <span class="s2">&quot;ABA&quot;</span>
+
+<span class="n">hits</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">haystack</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">needle</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">hits</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">needle</span><span class="si">}</span><span class="s2">&#39; occurs </span><span class="si">{</span><span class="n">hits</span><span class="si">}</span><span class="s2"> time(s) in &#39;</span><span class="si">{</span><span class="n">haystack</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[4]</div>
+          <div class="scroll-body"><pre>&#x27;ABA&#x27; occurs 3 time(s) in &#x27;ABABABAB&#x27;
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.5</p>
+        <h3 id="task-5">Task 5 — Case-Insensitive Alphabet Frequency</h3>
+        <p>Uses <code>collections.Counter</code> instead of a manual dictionary for tallying.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[5]</div>
+            <div class="scroll-body"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">mixed_case</span> <span class="o">=</span> <span class="s2">&quot;aAbBBcCCcAa&quot;</span>
+<span class="n">letter_tally</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">mixed_case</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+
+<span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">letter_tally</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">letter_tally</span><span class="p">[</span><span class="n">letter</span><span class="p">]</span><span class="si">}{</span><span class="n">letter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[5]</div>
+          <div class="scroll-body"><pre>4A
+3B
+4C
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.6</p>
+        <h3 id="task-6">Task 6 — Unique Words in a Sentence</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[6]</div>
+            <div class="scroll-body"><pre><span class="n">line6</span> <span class="o">=</span> <span class="s2">&quot;data is powerful and data is everywhere&quot;</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">line6</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">distinct_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unique words:&quot;</span><span class="p">,</span> <span class="n">distinct_words</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Count:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">distinct_words</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[6]</div>
+          <div class="scroll-body"><pre>Unique words: {&#x27;data&#x27;, &#x27;is&#x27;, &#x27;powerful&#x27;, &#x27;and&#x27;, &#x27;everywhere&#x27;}
+Count: 5
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.7</p>
+        <h3 id="task-7">Task 7 — Two Fruit Baskets</h3>
+        <p>Overlap, exclusives, and total unique count between two sets.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[7]</div>
+            <div class="scroll-body"><pre><span class="n">basket_one</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;papaya&quot;</span><span class="p">,</span> <span class="s2">&quot;banana&quot;</span><span class="p">,</span> <span class="s2">&quot;litchi&quot;</span><span class="p">,</span> <span class="s2">&quot;guava&quot;</span><span class="p">}</span>
+<span class="n">basket_two</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;banana&quot;</span><span class="p">,</span> <span class="s2">&quot;fig&quot;</span><span class="p">,</span> <span class="s2">&quot;kiwi&quot;</span><span class="p">,</span> <span class="s2">&quot;guava&quot;</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In both baskets   :&quot;</span><span class="p">,</span> <span class="n">basket_one</span> <span class="o">&amp;</span> <span class="n">basket_two</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Only in basket one:&quot;</span><span class="p">,</span> <span class="n">basket_one</span> <span class="o">-</span> <span class="n">basket_two</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total unique fruit:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basket_one</span> <span class="o">|</span> <span class="n">basket_two</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[7]</div>
+          <div class="scroll-body"><pre>In both baskets   : {&#x27;guava&#x27;, &#x27;banana&#x27;}
+Only in basket one: {&#x27;litchi&#x27;, &#x27;papaya&#x27;}
+Total unique fruit: 6
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 5.8</p>
+        <h3 id="task-8">Task 8 — Full Set Algebra on Colors</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[8]</div>
+            <div class="scroll-body"><pre><span class="n">palette_one</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;crimson&quot;</span><span class="p">,</span> <span class="s2">&quot;gold&quot;</span><span class="p">,</span> <span class="s2">&quot;indigo&quot;</span><span class="p">,</span> <span class="s2">&quot;teal&quot;</span><span class="p">}</span>
+<span class="n">palette_two</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lavender&quot;</span><span class="p">,</span> <span class="s2">&quot;teal&quot;</span><span class="p">,</span> <span class="s2">&quot;maroon&quot;</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Union              :&quot;</span><span class="p">,</span> <span class="n">palette_one</span> <span class="o">|</span> <span class="n">palette_two</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Intersection       :&quot;</span><span class="p">,</span> <span class="n">palette_one</span> <span class="o">&amp;</span> <span class="n">palette_two</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Only in palette_one:&quot;</span><span class="p">,</span> <span class="n">palette_one</span> <span class="o">-</span> <span class="n">palette_two</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Only in palette_two:&quot;</span><span class="p">,</span> <span class="n">palette_two</span> <span class="o">-</span> <span class="n">palette_one</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Symmetric diff.    :&quot;</span><span class="p">,</span> <span class="n">palette_one</span> <span class="o">^</span> <span class="n">palette_two</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[8]</div>
+          <div class="scroll-body"><pre>Union              : {&#x27;maroon&#x27;, &#x27;indigo&#x27;, &#x27;lavender&#x27;, &#x27;teal&#x27;, &#x27;crimson&#x27;, &#x27;gold&#x27;}
+Intersection       : {&#x27;teal&#x27;}
+Only in palette_one: {&#x27;indigo&#x27;, &#x27;crimson&#x27;, &#x27;gold&#x27;}
+Only in palette_two: {&#x27;maroon&#x27;, &#x27;lavender&#x27;}
+Symmetric diff.    : {&#x27;crimson&#x27;, &#x27;maroon&#x27;, &#x27;indigo&#x27;, &#x27;lavender&#x27;, &#x27;gold&#x27;}
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="backlash">Backlash risks</h2>
+    <p>Every skill has a cost when mishandled. These are the ways this one bites back.</p>
+    <div class="backlash"><div class="curse"><b>Expecting string methods to modify in place</b><span><code>text.upper()</code> returns a new string. You must assign it: <code>text = text.upper()</code>.</span></div><div class="curse"><b><code>.count()</code> and overlaps</b><span>It counts non-overlapping matches only. Scan manually when overlaps matter.</span></div><div class="curse"><b>Assuming sets keep order</b><span>Sets are unordered. If order matters, use a list — or <code>sorted(my_set)</code>.</span></div><div class="curse"><b>Trying to put a list in a set</b><span>Set members must be hashable. Lists aren't; tuples are.</span></div></div>
+
+    <div class="mastery">
+      <div class="m-top">✦ Mastery confirmed</div>
+      <p>Rank C — <b>Word-Weaving &amp; Set Sorcery</b> is now yours. All 8 trials
+         cleared, all spells verified against real output.</p>
+      <p style="margin-top:.6rem; font-family:var(--font-hud); font-size:.66rem; letter-spacing:.05em; color:var(--ink-mute);">
+        saved locally to this browser · visible on your Status Window
+      </p>
+    </div>
+
+    <div class="chronicle reveal">
+      <div class="chronicle-label">◆ Chronicle — what this power actually did</div>
+      <p>You point out, very politely, that his &#x27;model answer&#x27; key has a duplicate entry in it. He does not enjoy this. You, quietly, do.</p>
+    </div>
+
+    <nav class="trialnav"><a href="trial-4.html"><small>Previous trial</small><b>The Eternal Loop</b></a><a class="next" href="trial-6.html"><small>Next trial</small><b>The Vaultkeeper&#x27;s Art</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Trial 05 · Word-Weaving &amp; Set Sorcery</span>
+  <span><a href="index.html">Return to the Status Window</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+<script src="assets/progress.js"></script>
+</body>
+</html>

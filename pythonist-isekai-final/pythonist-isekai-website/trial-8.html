@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trial 08: Wards Against Corruption — Reincarnated as a Pythonist</title>
+<meta name="description" content="Not all data that enters your domain arrives clean.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/isekai.css">
+</head>
+<body data-role="trial" data-trial-n="8">
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> Status Window</span></a>
+    <span class="sep">/</span>
+    <span class="now">Trial 08</span>
+    <span class="spacer"></span>
+    <span class="mini-hud hud" id="mini-hud">LV. 0 · Vibhu HP 100%</span>
+    <span class="pips" title="8 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i></span>
+    <span class="pips-num hud">8/10</span>
+  </div>
+</div>
+
+<header class="thead wrap" style="--rc:#b91c1c">
+  <div class="rankline">
+    <span class="rank rank-Bp">B+</span>
+    <span class="trialno">Trial 08 of 10</span>
+  </div>
+  <h1>Wards Against Corruption</h1>
+  <p class="realname">a.k.a. Files and Failures — Persisting data, and writing code that survives bad input</p>
+
+  <img class="trial-banner" src="assets/img/power-08.jpg" alt="Rising power">
+  <div class="sysmsg">
+    <span class="sys-label">SYSTEM MESSAGE</span>
+    <p>Something in the archive is malformed. A lesser mage&#x27;s working would collapse entirely. You have learned to ward against exactly that.</p>
+  </div>
+</header>
+
+<div class="wrap layout" style="--rc:#b91c1c">
+  <nav class="toc" aria-label="On this page">
+    <a href="#lore">Lore</a>
+    <a href="#codex">Codex</a>
+    <a href="#trials">Trials</a>
+    <a href="#backlash">Backlash</a>
+  </nav>
+
+  <main class="prose" style="--rc:#b91c1c">
+    <h2 id="lore">Lore</h2>
+    <p>Everything so far has vanished the moment the program ended. <strong>File handling</strong> is how a program
+remembers: writing results to disk, reading yesterday's data back in, processing a file someone else
+produced.</p>
+<p>The mechanics are three steps — open, read or write, close — but the closing step is the one people
+forget, and forgetting it can mean data never actually reaches the disk. Python's answer is the
+<code>with</code> statement, which closes the file automatically no matter what happens inside, including if an
+error is raised. There is essentially no reason to open a file any other way.</p>
+<p>The second half of this chapter is the more grown-up idea. Real input is <em>dirty</em>: files go missing,
+lines are malformed, a number field contains the word "absent", a divisor turns out to be zero. Code
+that assumes clean input crashes on the first surprise and loses everything it had already done.</p>
+<p><strong>Exception handling</strong> changes that. The <code>try</code> block contains work that might fail; the <code>except</code> block
+says what to do when it does. The program keeps running. And once you can catch errors, you can also
+<em>raise</em> your own — including <strong>custom exception classes</strong> that describe problems in the language of
+your program (<code>BlankFileError</code>, <code>MalformedLineError</code>) rather than in generic Python terms. That is the
+difference between an error message a user can act on and one that just says <code>ValueError</code>.</p>
+
+    <div class="emblem-banner reveal" style="--rc:#b91c1c"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M50 16 L82 28 L82 52 C82 70 68 82 50 88 C32 82 18 70 18 52 L18 28 Z"
+        fill="none" stroke="currentColor" stroke-width="4.5" stroke-linejoin="round"/>
+  <line x1="50" y1="38" x2="50" y2="58" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="50" cy="68" r="3.4" fill="currentColor"/>
+</svg></div>
+
+    <h2 id="codex">Codex</h2>
+    <h3>File modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"r"</code></td>
+<td>read (default); errors if the file is missing</td>
+</tr>
+<tr>
+<td><code>"w"</code></td>
+<td>write — <strong>creates or wipes</strong> the file</td>
+</tr>
+<tr>
+<td><code>"a"</code></td>
+<td>append — add to the end, keep what's there</td>
+</tr>
+<tr>
+<td><code>"r+"</code></td>
+<td>read and write</td>
+</tr>
+</tbody>
+</table>
+<p>The destructiveness of <code>"w"</code> is worth respecting: opening an existing file in write mode empties it
+immediately, before you write a single byte.</p>
+<h3>The <code>with</code> pattern</h3>
+<pre><code class="language-python">with open(&quot;data.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+    lines = [line.strip() for line in f if line.strip()]
+</code></pre>
+<p>Three things are happening: the file closes itself at the end of the block; iterating a file object
+yields one line at a time without loading the whole file into memory; and <code>.strip()</code> removes the
+trailing newline that every line carries. Always pass <code>encoding="utf-8"</code> — it makes behaviour identical
+across Windows, macOS and Linux.</p>
+<h3>Catching errors precisely</h3>
+<pre><code class="language-python">try:
+    result = int(a) // int(b)
+except ZeroDivisionError:
+    print(&quot;cannot divide by zero&quot;)
+except ValueError:
+    print(&quot;that wasn't a number&quot;)
+else:
+    print(result)          # runs only if nothing failed
+finally:
+    cleanup()              # runs no matter what
+</code></pre>
+<p>Catch <strong>specific</strong> exceptions. A bare <code>except:</code> swallows everything — including typos in your own code
+and the user's Ctrl-C — and turns a five-second bug into a five-hour one.</p>
+<h3>Custom exceptions</h3>
+<pre><code class="language-python">class MalformedLineError(Exception):
+    pass
+</code></pre>
+<p>Three lines gives you an error type that means something in your domain. <code>raise ... from err</code> preserves
+the original cause, so the traceback shows both what went wrong and what you were doing at the time.</p>
+
+    <h2 id="trials">The trials</h2>
+    <p>Lore is only theory. Each trial below must be cast and cleared —
+       objective stated, spell cast, result confirmed.</p>
+    
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 8.1</p>
+        <h3 id="task-1">Task 1 — Names File: Count, Vowel-Starts, Longest</h3>
+        <p>Write a handful of names to <code>roster.txt</code>, one per line, then read them back
+and compute three quick stats.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[1]</div>
+            <div class="scroll-body"><pre><span class="n">roster_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ibrahim&quot;</span><span class="p">,</span> <span class="s2">&quot;Sneha&quot;</span><span class="p">,</span> <span class="s2">&quot;Utkarsh&quot;</span><span class="p">,</span> <span class="s2">&quot;Elena&quot;</span><span class="p">,</span> <span class="s2">&quot;Om&quot;</span><span class="p">,</span> <span class="s2">&quot;Ananya&quot;</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;roster.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">roster_names</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">nm</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;roster.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">loaded_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+
+<span class="n">vowel_starters</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="s2">&quot;AEIOUaeiou&quot;</span><span class="p">)</span>
+<span class="n">total_names</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded_names</span><span class="p">)</span>
+<span class="n">vowel_start_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nm</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">vowel_starters</span><span class="p">)</span> <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">loaded_names</span><span class="p">)</span>
+<span class="n">longest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">loaded_names</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Names read back :&quot;</span><span class="p">,</span> <span class="n">loaded_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total names     :&quot;</span><span class="p">,</span> <span class="n">total_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start with vowel:&quot;</span><span class="p">,</span> <span class="n">vowel_start_count</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Longest name    :&quot;</span><span class="p">,</span> <span class="n">longest</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[1]</div>
+          <div class="scroll-body"><pre>Names read back : [&#x27;Ibrahim&#x27;, &#x27;Sneha&#x27;, &#x27;Utkarsh&#x27;, &#x27;Elena&#x27;, &#x27;Om&#x27;, &#x27;Ananya&#x27;]
+Total names     : 6
+Start with vowel: 5
+Longest name    : Ibrahim
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 8.2</p>
+        <h3 id="task-2">Task 2 — Numbers File: Max, Average, Count Above 100</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[2]</div>
+            <div class="scroll-body"><pre><span class="n">figures</span> <span class="o">=</span> <span class="p">[</span><span class="mi">88</span><span class="p">,</span> <span class="mi">145</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">275</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">190</span><span class="p">,</span> <span class="mi">101</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;figures.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">figures</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;figures.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">loaded_figures</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Numbers        :&quot;</span><span class="p">,</span> <span class="n">loaded_figures</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Maximum         :&quot;</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">loaded_figures</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average         :&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">loaded_figures</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded_figures</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Count over 100  :&quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">loaded_figures</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[2]</div>
+          <div class="scroll-body"><pre>Numbers        : [88, 145, 12, 275, 60, 190, 101]
+Maximum         : 275
+Average         : 124.43
+Count over 100  : 4
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 8.3</p>
+        <h3 id="task-3">Task 3 — City Records: Parse, Filter, Aggregate</h3>
+        <p><code>towns.txt</code> stores <code>city_name population_in_lakhs area_in_sq_km</code> per line.
+Each line is split and typed on read, then queried.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[3]</div>
+            <div class="scroll-body"><pre><span class="n">town_records</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;Nashik&quot;</span><span class="p">,</span> <span class="mf">20.30</span><span class="p">,</span> <span class="mf">259.13</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Lucknow&quot;</span><span class="p">,</span> <span class="mf">35.00</span><span class="p">,</span> <span class="mf">631.00</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Kochi&quot;</span><span class="p">,</span> <span class="mf">6.02</span><span class="p">,</span> <span class="mf">94.88</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Surat&quot;</span><span class="p">,</span> <span class="mf">65.00</span><span class="p">,</span> <span class="mf">474.00</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Bhopal&quot;</span><span class="p">,</span> <span class="mf">22.00</span><span class="p">,</span> <span class="mf">463.00</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;towns.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">town_records</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pop</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">parsed_towns</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;towns.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pieces</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pieces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">parsed_towns</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pieces</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">pieces</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pieces</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All town details:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">parsed_towns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: population=</span><span class="si">{</span><span class="n">pop</span><span class="si">}</span><span class="s2"> lakh, area=</span><span class="si">{</span><span class="n">area</span><span class="si">}</span><span class="s2"> sq km&quot;</span><span class="p">)</span>
+
+<span class="n">big_towns</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">parsed_towns</span> <span class="k">if</span> <span class="n">pop</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">]</span>
+<span class="n">combined_area</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">area</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">parsed_towns</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Towns with population &gt; 10 lakhs:&quot;</span><span class="p">,</span> <span class="n">big_towns</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Combined area of all towns:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">combined_area</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;sq km&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[3]</div>
+          <div class="scroll-body"><pre>All town details:
+  Nashik: population=20.3 lakh, area=259.13 sq km
+  Lucknow: population=35.0 lakh, area=631.0 sq km
+  Kochi: population=6.02 lakh, area=94.88 sq km
+  Surat: population=65.0 lakh, area=474.0 sq km
+  Bhopal: population=22.0 lakh, area=463.0 sq km
+
+Towns with population &gt; 10 lakhs: [&#x27;Nashik&#x27;, &#x27;Lucknow&#x27;, &#x27;Surat&#x27;, &#x27;Bhopal&#x27;]
+Combined area of all towns: 1922.01 sq km
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 8.4</p>
+        <h3 id="task-4">Task 4 — Guarded Integer Division Across Several Cases</h3>
+        <p>Each <code>a b</code> pair is divided with <code>//</code>, catching both a zero divisor and
+non-numeric input so one bad line doesn't stop the rest.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[4]</div>
+            <div class="scroll-body"><pre><span class="n">raw_cases</span> <span class="o">=</span> <span class="s2">&quot;4</span><span class="se">\n</span><span class="s2">10 2</span><span class="se">\n</span><span class="s2">7 0</span><span class="se">\n</span><span class="s2">9 x</span><span class="se">\n</span><span class="s2">20 4&quot;</span>
+
+<span class="n">case_lines</span> <span class="o">=</span> <span class="n">raw_cases</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<span class="n">case_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">case_lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">case_lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">case_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+    <span class="n">left_text</span><span class="p">,</span> <span class="n">right_text</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">outcome</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">left_text</span><span class="p">)</span> <span class="o">//</span> <span class="nb">int</span><span class="p">(</span><span class="n">right_text</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ZeroDivisionError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error Code:&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[4]</div>
+          <div class="scroll-body"><pre>5
+Error Code: integer division or modulo by zero
+Error Code: invalid literal for int() with base 10: &#x27;x&#x27;
+5
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 8.5</p>
+        <h3 id="task-5">Task 5 — Custom Exceptions for a Marks File</h3>
+        <p>Two purpose-built exception classes flag domain-specific problems:
+<code>BlankFileError</code> for an empty file, and <code>MalformedLineError</code> for a badly
+shaped record. Wrapping the low-level <code>FileNotFoundError</code> keeps the
+messages consistent across all three failure modes.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[5]</div>
+            <div class="scroll-body"><pre><span class="k">class</span><span class="w"> </span><span class="nc">BlankFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MalformedLineError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_marks</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">raw_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_lines</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BlankFileError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; has no data.&quot;</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">raw_lines</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MalformedLineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad line format: &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="n">student</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MalformedLineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Non-numeric mark in: &#39;</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="n">student</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;marks_ok.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Kabir,91</span><span class="se">\n</span><span class="s2">Zara,84</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;marks_bad.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Kabir-91</span><span class="se">\n</span><span class="s2">Zara,notanumber</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ghost_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;marks_bad.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;marks_ok.txt&quot;</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="n">load_marks</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">parsed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="n">BlankFileError</span><span class="p">,</span> <span class="n">MalformedLineError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[5]</div>
+          <div class="scroll-body"><pre>ghost_file.txt -&gt; Could not find &#x27;ghost_file.txt&#x27;.
+marks_bad.txt -&gt; Bad line format: &#x27;Kabir-91&#x27;
+marks_ok.txt -&gt; {&#x27;Kabir&#x27;: 91.0, &#x27;Zara&#x27;: 84.0}
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="backlash">Backlash risks</h2>
+    <p>Every skill has a cost when mishandled. These are the ways this one bites back.</p>
+    <div class="backlash"><div class="curse"><b>Opening with <code>"w"</code> to read</b><span>Write mode erases the file instantly. Reading needs <code>"r"</code>; adding needs <code>"a"</code>.</span></div><div class="curse"><b>Bare <code>except:</code></b><span>It hides every error, including your own bugs. Always name the exception you expect.</span></div><div class="curse"><b>Forgetting <code>.strip()</code></b><span>Every line read from a file ends with <code>\n</code>, so <code>"5\n" == "5"</code> is False.</span></div><div class="curse"><b>Catching errors you can't handle</b><span>If there is no sensible recovery, let it crash loudly rather than silently continuing with bad data.</span></div></div>
+
+    <div class="mastery">
+      <div class="m-top">✦ Mastery confirmed</div>
+      <p>Rank B+ — <b>Wards Against Corruption</b> is now yours. All 5 trials
+         cleared, all spells verified against real output.</p>
+      <p style="margin-top:.6rem; font-family:var(--font-hud); font-size:.66rem; letter-spacing:.05em; color:var(--ink-mute);">
+        saved locally to this browser · visible on your Status Window
+      </p>
+    </div>
+
+    <div class="chronicle reveal">
+      <div class="chronicle-label">◆ Chronicle — what this power actually did</div>
+      <p>Vibhu Gautam hands you a &#x27;corrupted&#x27; test file, insisting it was an accident. Your program catches it, reports the error cleanly, and keeps going. He looks almost disappointed that nothing caught fire.</p>
+    </div>
+
+    <nav class="trialnav"><a href="trial-7.html"><small>Previous trial</small><b>Summoning Circles</b></a><a class="next" href="trial-9.html"><small>Next trial</small><b>Bloodline Forging</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Trial 08 · Wards Against Corruption</span>
+  <span><a href="index.html">Return to the Status Window</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+<script src="assets/progress.js"></script>
+</body>
+</html>
