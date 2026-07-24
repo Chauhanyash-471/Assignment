@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trial 04: The Eternal Loop — Reincarnated as a Pythonist</title>
+<meta name="description" content="A cycle that repeats — until, one day, it doesn&#x27;t.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/isekai.css">
+</head>
+<body data-role="trial" data-trial-n="4">
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> Status Window</span></a>
+    <span class="sep">/</span>
+    <span class="now">Trial 04</span>
+    <span class="spacer"></span>
+    <span class="mini-hud hud" id="mini-hud">LV. 0 · Vibhu HP 100%</span>
+    <span class="pips" title="4 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="pips-num hud">4/10</span>
+  </div>
+</div>
+
+<header class="thead wrap" style="--rc:#A78BFA">
+  <div class="rankline">
+    <span class="rank rank-Dp">D+</span>
+    <span class="trialno">Trial 04 of 10</span>
+  </div>
+  <h1>The Eternal Loop</h1>
+  <p class="realname">a.k.a. Repetition Without Repeating Yourself — for, while, and the classic number problems that teach them</p>
+
+  <div class="sysmsg">
+    <span class="sys-label">SYSTEM MESSAGE</span>
+    <p>You have discovered a spell that casts itself, again and again, bound only by a condition of your choosing. Choose that condition wisely.</p>
+  </div>
+</header>
+
+<div class="wrap layout" style="--rc:#A78BFA">
+  <nav class="toc" aria-label="On this page">
+    <a href="#lore">Lore</a>
+    <a href="#codex">Codex</a>
+    <a href="#trials">Trials</a>
+    <a href="#backlash">Backlash</a>
+  </nav>
+
+  <main class="prose" style="--rc:#A78BFA">
+    <h2 id="lore">Lore</h2>
+    <p>Loops are where programming starts to pay for itself. Printing a multiplication table by hand takes
+ten <code>print</code> statements; a loop does it in two lines and works for any number you give it.</p>
+<p>Python offers two loop keywords, and choosing between them is almost always obvious once you ask one
+question: <strong>do I know in advance how many times this repeats?</strong></p>
+<p>If yes — you are walking through a list, counting to ten, processing each character of a string — use
+<code>for</code>. Python's <code>for</code> is a <em>for-each</em> loop: it hands you the items themselves, not index numbers.</p>
+<p>If no — you are repeating until a total exceeds a limit, until input is valid, until a search
+succeeds — use <code>while</code>. A <code>while</code> loop keeps going as long as its condition holds, which means
+<strong>you</strong> are responsible for making sure the condition eventually becomes false.</p>
+<p>This chapter also introduces a genuinely important idea: the same problem can be solved by algorithms
+of very different quality. Testing whether a number is prime by dividing by every smaller number works,
+but stopping at the square root does the same job far faster. Generating <em>all</em> primes up to a limit is
+faster still with a sieve, which flips the question from "is this prime?" to "cross out everything that
+isn't". Same output, different thinking.</p>
+
+    <div class="emblem-banner reveal" style="--rc:#A78BFA"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M50 18a32 32 0 1 1 -22.6 9.4" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <path d="M18 16 L27 27 L38 18" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
+
+    <h2 id="codex">Codex</h2>
+    <h3>The anatomy of a <code>for</code> loop</h3>
+<pre><code class="language-python">for item in collection:
+    do_something(item)
+</code></pre>
+<p><code>range()</code> is the standard way to loop a fixed number of times. <code>range(2, 10, 3)</code> produces <code>2, 5, 8</code> —
+start, stop (exclusive), step. The stop value being <em>excluded</em> is deliberate: <code>range(n)</code> gives you
+exactly <code>n</code> values, and <code>range(len(x))</code> covers every valid index.</p>
+<h3>Controlling a loop from inside</h3>
+<table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>break</code></td>
+<td>leave the loop immediately</td>
+</tr>
+<tr>
+<td><code>continue</code></td>
+<td>skip to the next iteration</td>
+</tr>
+<tr>
+<td><code>else</code></td>
+<td>runs only if the loop finished <em>without</em> <code>break</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>break</code> is what makes the primality test efficient — the moment a divisor is found, there is no reason
+to keep looking.</p>
+<h3>Accumulator patterns</h3>
+<p>Most loop problems are one of a few shapes:</p>
+<ul>
+<li><strong>Running total</strong> — start at <code>0</code>, add each item (digit sums)</li>
+<li><strong>Running product</strong> — start at <code>1</code>, multiply each item (factorials)</li>
+<li><strong>Building a list</strong> — start empty, <code>append</code> matches (filtering)</li>
+<li><strong>Rolling pair</strong> — keep the last two values (<code>a, b = b, a + b</code> for Fibonacci)</li>
+</ul>
+<p>Recognising which shape a problem is halves the work of writing it.</p>
+<h3>Sieve thinking</h3>
+<p>The Sieve of Eratosthenes is over two thousand years old and still the standard way to list primes.
+Rather than testing each number, assume every number is prime, then walk through and cross out every
+multiple of each prime you find. What survives is the answer.</p>
+
+    <h2 id="trials">The trials</h2>
+    <p>Lore is only theory. Each trial below must be cast and cleared —
+       objective stated, spell cast, result confirmed.</p>
+    
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.1</p>
+        <h3 id="task-1">Task 1 — Factorial via a Running Product</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[1]</div>
+            <div class="scroll-body"><pre><span class="n">target</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">running_product</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">target</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">running_product</span> <span class="o">*=</span> <span class="n">step</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">! = </span><span class="si">{</span><span class="n">running_product</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[1]</div>
+          <div class="scroll-body"><pre>7! = 5040
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.2</p>
+        <h3 id="task-2">Task 2 — Armstrong Number Check</h3>
+        <p>A number is Armstrong if the sum of its digits, each raised to the power
+of the digit count, equals the number itself (e.g. 153 = 1^3+5^3+3^3).</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[2]</div>
+            <div class="scroll-body"><pre><span class="n">candidate</span> <span class="o">=</span> <span class="mi">371</span>
+<span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">candidate</span><span class="p">)]</span>
+<span class="n">power</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>
+<span class="n">digit_power_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span> <span class="o">**</span> <span class="n">power</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">digits</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">candidate</span><span class="si">}</span><span class="s2"> -&gt; digit-power sum = </span><span class="si">{</span><span class="n">digit_power_sum</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Armstrong number!&quot;</span> <span class="k">if</span> <span class="n">digit_power_sum</span> <span class="o">==</span> <span class="n">candidate</span> <span class="k">else</span> <span class="s2">&quot;Not an Armstrong number.&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[2]</div>
+          <div class="scroll-body"><pre>371 -&gt; digit-power sum = 371
+Armstrong number!
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.3</p>
+        <h3 id="task-3">Task 3 — Fibonacci Series, N Terms</h3>
+        <p>Built with a <code>while</code> loop this time, generating terms into a list before
+printing them together.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[3]</div>
+            <div class="scroll-body"><pre><span class="n">num_terms</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">fib_series</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">fib_series</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_terms</span><span class="p">:</span>
+    <span class="n">fib_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fibonacci series:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">fib_series</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[3]</div>
+          <div class="scroll-body"><pre>Fibonacci series: 0 1 1 2 3 5 8 13 21 34 55 89
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.4</p>
+        <h3 id="task-4">Task 4 — Primality Test</h3>
+        <p>Trial division only needs to go up to the square root of the number.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[4]</div>
+            <div class="scroll-body"><pre><span class="n">possible_prime</span> <span class="o">=</span> <span class="mi">97</span>
+
+<span class="k">if</span> <span class="n">possible_prime</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">verdict</span> <span class="o">=</span> <span class="s2">&quot;is not prime&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">verdict</span> <span class="o">=</span> <span class="s2">&quot;is prime&quot;</span>
+    <span class="k">for</span> <span class="n">divisor</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">possible_prime</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">possible_prime</span> <span class="o">%</span> <span class="n">divisor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verdict</span> <span class="o">=</span> <span class="s2">&quot;is not prime&quot;</span>
+            <span class="k">break</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">possible_prime</span><span class="p">,</span> <span class="n">verdict</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[4]</div>
+          <div class="scroll-body"><pre>97 is prime
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.5</p>
+        <h3 id="task-5">Task 5 — Palindrome Number Check</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[5]</div>
+            <div class="scroll-body"><pre><span class="n">num_to_check</span> <span class="o">=</span> <span class="mi">75457</span>
+<span class="n">digits_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_to_check</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_to_check</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="s1">&#39;a palindrome&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">digits_str</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">digits_str</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;not a palindrome&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[5]</div>
+          <div class="scroll-body"><pre>75457 is a palindrome
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.6</p>
+        <h3 id="task-6">Task 6 — Sum of Digits</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[6]</div>
+            <div class="scroll-body"><pre><span class="n">some_number</span> <span class="o">=</span> <span class="mi">48213</span>
+<span class="n">digit_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">some_number</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sum of digits:&quot;</span><span class="p">,</span> <span class="n">digit_total</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[6]</div>
+          <div class="scroll-body"><pre>Sum of digits: 18
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.7</p>
+        <h3 id="task-7">Task 7 — Numbers Divisible by 5 or 7, 1 to 100</h3>
+        <p>Built with a <code>while</code> loop and manual accumulation, as an alternative to a
+comprehension.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[7]</div>
+            <div class="scroll-body"><pre><span class="n">hits</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">while</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">7</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">hits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matching numbers:&quot;</span><span class="p">,</span> <span class="n">hits</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;How many:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">hits</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[7]</div>
+          <div class="scroll-body"><pre>Matching numbers: [5, 7, 10, 14, 15, 20, 21, 25, 28, 30, 35, 40, 42, 45, 49, 50, 55, 56, 60, 63, 65, 70, 75, 77, 80, 84, 85, 90, 91, 95, 98, 100]
+How many: 32
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.8</p>
+        <h3 id="task-8">Task 8 — Lowercase to Uppercase Conversion</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[8]</div>
+            <div class="scroll-body"><pre><span class="n">sample_text</span> <span class="o">=</span> <span class="s2">&quot;loops make repetition painless&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original :&quot;</span><span class="p">,</span> <span class="n">sample_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uppercase:&quot;</span><span class="p">,</span> <span class="n">sample_text</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[8]</div>
+          <div class="scroll-body"><pre>Original : loops make repetition painless
+Uppercase: LOOPS MAKE REPETITION PAINLESS
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.9</p>
+        <h3 id="task-9">Task 9 — All Primes Between 1 and 100</h3>
+        <p>Sieve-style: start assuming everything is prime, cross out multiples.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[9]</div>
+            <div class="scroll-body"><pre><span class="n">upper_limit</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">is_prime_flag</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">upper_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">is_prime_flag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_prime_flag</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">upper_limit</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_prime_flag</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">multiple</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">upper_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+            <span class="n">is_prime_flag</span><span class="p">[</span><span class="n">multiple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">prime_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">num</span> <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">flag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">is_prime_flag</span><span class="p">)</span> <span class="k">if</span> <span class="n">flag</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Primes up to 100:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">prime_list</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[9]</div>
+          <div class="scroll-body"><pre>Primes up to 100:
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 4.10</p>
+        <h3 id="task-10">Task 10 — Multiplication Table</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[10]</div>
+            <div class="scroll-body"><pre><span class="n">table_for</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="k">for</span> <span class="n">multiplier</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table_for</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">multiplier</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">table_for</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">multiplier</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[10]</div>
+          <div class="scroll-body"><pre>8 x 1 = 8
+8 x 2 = 16
+8 x 3 = 24
+8 x 4 = 32
+8 x 5 = 40
+8 x 6 = 48
+8 x 7 = 56
+8 x 8 = 64
+8 x 9 = 72
+8 x 10 = 80
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="backlash">Backlash risks</h2>
+    <p>Every skill has a cost when mishandled. These are the ways this one bites back.</p>
+    <div class="backlash"><div class="curse"><b>The infinite <code>while</code></b><span>If nothing inside the loop changes the condition, it never ends. Always ask: what makes this stop?</span></div><div class="curse"><b>Off-by-one on <code>range</code></b><span><code>range(1, 10)</code> stops at 9. To include 10, write <code>range(1, 11)</code>.</span></div><div class="curse"><b>Modifying a list while looping over it</b><span>Removing items mid-iteration skips elements. Build a new list instead.</span></div><div class="curse"><b>Wrong accumulator seed</b><span>Starting a product at <code>0</code> gives <code>0</code> forever. Products start at <code>1</code>, sums start at <code>0</code>.</span></div></div>
+
+    <div class="mastery">
+      <div class="m-top">✦ Mastery confirmed</div>
+      <p>Rank D+ — <b>The Eternal Loop</b> is now yours. All 10 trials
+         cleared, all spells verified against real output.</p>
+      <p style="margin-top:.6rem; font-family:var(--font-hud); font-size:.66rem; letter-spacing:.05em; color:var(--ink-mute);">
+        saved locally to this browser · visible on your Status Window
+      </p>
+    </div>
+
+    <div class="chronicle reveal">
+      <div class="chronicle-label">◆ Chronicle — what this power actually did</div>
+      <p>You automate what used to take Vibhu Gautam an hour to grade by hand. His red pen runs dry checking your output before your loop even finishes.</p>
+    </div>
+
+    <nav class="trialnav"><a href="trial-3.html"><small>Previous trial</small><b>Path of Choosing</b></a><a class="next" href="trial-5.html"><small>Next trial</small><b>Word-Weaving &amp; Set Sorcery</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Trial 04 · The Eternal Loop</span>
+  <span><a href="index.html">Return to the Status Window</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+<script src="assets/progress.js"></script>
+</body>
+</html>

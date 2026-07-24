@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trial 07: Summoning Circles — Reincarnated as a Pythonist</title>
+<meta name="description" content="Draw the circle once. Summon its result a thousand times.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/isekai.css">
+</head>
+<body data-role="trial" data-trial-n="7">
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> Status Window</span></a>
+    <span class="sep">/</span>
+    <span class="now">Trial 07</span>
+    <span class="spacer"></span>
+    <span class="mini-hud hud" id="mini-hud">LV. 0 · Vibhu HP 100%</span>
+    <span class="pips" title="7 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="pips-num hud">7/10</span>
+  </div>
+</div>
+
+<header class="thead wrap" style="--rc:#dc2626">
+  <div class="rankline">
+    <span class="rank rank-B">B</span>
+    <span class="trialno">Trial 07 of 10</span>
+  </div>
+  <h1>Summoning Circles</h1>
+  <p class="realname">a.k.a. Functions — Packaging Behaviour — Parameters, return values, recursion, and lambdas</p>
+
+  <div class="sysmsg">
+    <span class="sys-label">SYSTEM MESSAGE</span>
+    <p>You have learned to inscribe a circle that performs the same working every time it is invoked — fed new offerings, returning new results.</p>
+  </div>
+</header>
+
+<div class="wrap layout" style="--rc:#dc2626">
+  <nav class="toc" aria-label="On this page">
+    <a href="#lore">Lore</a>
+    <a href="#codex">Codex</a>
+    <a href="#trials">Trials</a>
+    <a href="#backlash">Backlash</a>
+  </nav>
+
+  <main class="prose" style="--rc:#dc2626">
+    <h2 id="lore">Lore</h2>
+    <p>Up to this point every program has been a single flat sequence of instructions. That works until it
+doesn't — until the same logic is needed in three places, or a file grows past what you can hold in
+your head.</p>
+<p>A <strong>function</strong> solves both problems at once. It gives a chunk of behaviour a <em>name</em>, a set of <em>inputs</em>,
+and an <em>output</em>, and from then on the rest of your program can use it without knowing how it works
+inside. That boundary is called <strong>abstraction</strong>, and it is the single most important idea in
+programming. You already rely on it constantly: you call <code>len()</code> without any idea how it counts.</p>
+<p>Two supporting concepts make functions trustworthy. <strong>Scope</strong> means variables created inside a
+function are invisible outside it — so a function cannot accidentally clobber your other variables.
+And a <strong>return value</strong> means a function hands a result back to whoever called it, rather than just
+printing something. A function that prints is a dead end; a function that returns can be reused,
+combined, tested and chained.</p>
+<p>This chapter also introduces <strong>recursion</strong>: a function that calls itself. It is the natural way to
+express problems that contain smaller copies of themselves, and every recursive function needs two
+parts — a <strong>base case</strong> that stops the descent, and a <strong>recursive case</strong> that moves toward it.</p>
+
+    <div class="emblem-banner reveal" style="--rc:#dc2626"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="24" fill="none" stroke="currentColor" stroke-width="4.5"/>
+  <path d="M14 50 L26 50" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <path d="M74 50 L86 50" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+  <path d="M20 44 L26 50 L20 56" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80 44 L86 50 L80 56" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
+
+    <h2 id="codex">Codex</h2>
+    <h3>Defining and calling</h3>
+<pre><code class="language-python">def area_of_circle(radius):       # 'radius' is the parameter
+    return 3.14159 * radius ** 2  # 'return' hands the answer back
+
+a = area_of_circle(5)             # '5' is the argument
+</code></pre>
+<p>If a function has no <code>return</code>, it silently returns <code>None</code>.</p>
+<h3>The four ways to pass arguments</h3>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Example</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Positional</td>
+<td><code>f(3, 5)</code></td>
+<td>order decides which is which</td>
+</tr>
+<tr>
+<td>Keyword</td>
+<td><code>f(height=5, width=3)</code></td>
+<td>order stops mattering; far more readable</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>def f(msg="hi")</code></td>
+<td>caller may omit it</td>
+</tr>
+<tr>
+<td>Variable-length</td>
+<td><code>def f(*args)</code></td>
+<td>accept any number of values</td>
+</tr>
+</tbody>
+</table>
+<p><code>*args</code> collects extra positional arguments into a tuple — which is how <code>total_of(72, 88, 91)</code> works
+without knowing the count in advance. Its partner <code>**kwargs</code> does the same for keyword arguments.</p>
+<h3>Recursion, concretely</h3>
+<pre><code class="language-python">def fib(n):
+    if n &lt;= 1:        # BASE CASE — stops the recursion
+        return n
+    return fib(n-1) + fib(n-2)   # RECURSIVE CASE — smaller problem
+</code></pre>
+<p>Elegant, and a useful demonstration — but be aware it recomputes the same values enormously often. For
+<code>fib(30)</code> that is over a million calls. Recursion buys clarity; it does not always buy speed.</p>
+<h3>Lambdas</h3>
+<p>A <code>lambda</code> is a small anonymous function written inline:</p>
+<pre><code class="language-python">cone_volume = lambda r, h: (1/3) * math.pi * r**2 * h
+</code></pre>
+<p>Perfect as a throwaway <code>key=</code> argument to <code>sorted()</code>. If you find yourself naming a lambda and reusing
+it, it deserves to be a proper <code>def</code> — with a docstring.</p>
+
+    <h2 id="trials">The trials</h2>
+    <p>Lore is only theory. Each trial below must be cast and cleared —
+       objective stated, spell cast, result confirmed.</p>
+    
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.1</p>
+        <h3 id="task-1">Task 1 — Max and Min Without Built-ins</h3>
+        <p>A single pass tracks the running maximum and minimum manually.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[1]</div>
+            <div class="scroll-body"><pre><span class="k">def</span><span class="w"> </span><span class="nf">extremes</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="n">top</span><span class="p">:</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">bottom</span><span class="p">:</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span>
+
+<span class="n">sample_values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">121</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">77</span><span class="p">]</span>
+<span class="n">highest</span><span class="p">,</span> <span class="n">lowest</span> <span class="o">=</span> <span class="n">extremes</span><span class="p">(</span><span class="n">sample_values</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Maximum:&quot;</span><span class="p">,</span> <span class="n">highest</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimum:&quot;</span><span class="p">,</span> <span class="n">lowest</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[1]</div>
+          <div class="scroll-body"><pre>Maximum: 121
+Minimum: 3
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.2</p>
+        <h3 id="task-2">Task 2 — Sum of Cubes Below n</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[2]</div>
+            <div class="scroll-body"><pre><span class="k">def</span><span class="w"> </span><span class="nf">cubes_below</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">**</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+<span class="n">limit</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sum of cubes below </span><span class="si">{</span><span class="n">limit</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">cubes_below</span><span class="p">(</span><span class="n">limit</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[2]</div>
+          <div class="scroll-body"><pre>Sum of cubes below 7: 441
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.3</p>
+        <h3 id="task-3">Task 3 — Recursive Count-Up (No Loops)</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[3]</div>
+            <div class="scroll-body"><pre><span class="k">def</span><span class="w"> </span><span class="nf">count_up_to</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">count_up_to</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+<span class="n">count_up_to</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[3]</div>
+          <div class="scroll-body"><pre>1 2 3 4 5 6 7 8 9 10 11 12 
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.4</p>
+        <h3 id="task-4">Task 4 — Recursive Fibonacci, n Terms</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[4]</div>
+            <div class="scroll-body"><pre><span class="k">def</span><span class="w"> </span><span class="nf">fib_term</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">fib_term</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib_term</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">term_count</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">series</span> <span class="o">=</span> <span class="p">[</span><span class="n">fib_term</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">term_count</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fibonacci series:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">series</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[4]</div>
+          <div class="scroll-body"><pre>Fibonacci series: 0 1 1 2 3 5 8 13 21
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.5</p>
+        <h3 id="task-5">Task 5 — Cone Volume as a Lambda</h3>
+        <p><code>V = (1/3) * pi * r^2 * h</code></p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[5]</div>
+            <div class="scroll-body"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="n">cone_volume</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">height</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Volume of cone:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">cone_volume</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[5]</div>
+          <div class="scroll-body"><pre>Volume of cone: 150.796
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.6</p>
+        <h3 id="task-6">Task 6 — Max/Min Tuple as a Lambda</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[6]</div>
+            <div class="scroll-body"><pre><span class="n">spread</span> <span class="o">=</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">seq</span><span class="p">:</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(max, min):&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="p">(</span><span class="n">spread</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[6]</div>
+          <div class="scroll-body"><pre>(max, min): (88, 4)
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 7.7</p>
+        <h3 id="task-7">Task 7 — Keyword, Default, and Variable-Length Arguments</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[7]</div>
+            <div class="scroll-body"><pre><span class="c1"># Keyword arguments: order doesn&#39;t matter, names do</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">profile</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, Age: </span><span class="si">{</span><span class="n">age</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">profile</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Kabir&quot;</span><span class="p">)</span>
+
+<span class="c1"># Default arguments: a fallback value if the caller omits it</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;Welcome aboard!&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">welcome</span><span class="p">(</span><span class="s2">&quot;Sneha&quot;</span><span class="p">)</span>
+<span class="n">welcome</span><span class="p">(</span><span class="s2">&quot;Sneha&quot;</span><span class="p">,</span> <span class="s2">&quot;Great to have you back&quot;</span><span class="p">)</span>
+
+<span class="c1"># Variable-length arguments: *args collects any number of positionals</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">total_of</span><span class="p">(</span><span class="o">*</span><span class="n">scores</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total marks:&quot;</span><span class="p">,</span> <span class="n">total_of</span><span class="p">(</span><span class="mi">72</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">84</span><span class="p">))</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[7]</div>
+          <div class="scroll-body"><pre>Name: Kabir, Age: 23
+Sneha: Welcome aboard!
+Sneha: Great to have you back
+Total marks: 402
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="backlash">Backlash risks</h2>
+    <p>Every skill has a cost when mishandled. These are the ways this one bites back.</p>
+    <div class="backlash"><div class="curse"><b>Printing instead of returning</b><span>A function that only prints can't be reused in a calculation. Return the value; print at the call site.</span></div><div class="curse"><b>Recursion with no base case</b><span>Without a stopping condition you get <code>RecursionError</code>. Write the base case first.</span></div><div class="curse"><b>Mutable default arguments</b><span><code>def f(items=[])</code> reuses the <em>same</em> list across calls. Use <code>None</code> and create inside.</span></div><div class="curse"><b>Shadowing built-ins</b><span>Naming a variable <code>list</code>, <code>sum</code> or <code>str</code> breaks the real one for the rest of the scope.</span></div></div>
+
+    <div class="mastery">
+      <div class="m-top">✦ Mastery confirmed</div>
+      <p>Rank B — <b>Summoning Circles</b> is now yours. All 7 trials
+         cleared, all spells verified against real output.</p>
+      <p style="margin-top:.6rem; font-family:var(--font-hud); font-size:.66rem; letter-spacing:.05em; color:var(--ink-mute);">
+        saved locally to this browser · visible on your Status Window
+      </p>
+    </div>
+
+    <div class="chronicle reveal">
+      <div class="chronicle-label">◆ Chronicle — what this power actually did</div>
+      <p>He assigns the same problem four different ways, hoping to catch you copy-pasting. You write the function once and call it four times. He grades all four before he understands what happened.</p>
+    </div>
+
+    <nav class="trialnav"><a href="trial-6.html"><small>Previous trial</small><b>The Vaultkeeper&#x27;s Art</b></a><a class="next" href="trial-8.html"><small>Next trial</small><b>Wards Against Corruption</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Trial 07 · Summoning Circles</span>
+  <span><a href="index.html">Return to the Status Window</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+<script src="assets/progress.js"></script>
+</body>
+</html>

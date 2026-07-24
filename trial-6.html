@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trial 06: The Vaultkeeper&#x27;s Art — Reincarnated as a Pythonist</title>
+<meta name="description" content="Three vaults. Ordered, sealed, and indexed by name.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/isekai.css">
+</head>
+<body data-role="trial" data-trial-n="6">
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <a href="index.html">←<span class="backtext"> Status Window</span></a>
+    <span class="sep">/</span>
+    <span class="now">Trial 06</span>
+    <span class="spacer"></span>
+    <span class="mini-hud hud" id="mini-hud">LV. 0 · Vibhu HP 100%</span>
+    <span class="pips" title="6 of 10"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>
+    <span class="pips-num hud">6/10</span>
+  </div>
+</div>
+
+<header class="thead wrap" style="--rc:#E879F9">
+  <div class="rankline">
+    <span class="rank rank-Cp">C+</span>
+    <span class="trialno">Trial 06 of 10</span>
+  </div>
+  <h1>The Vaultkeeper&#x27;s Art</h1>
+  <p class="realname">a.k.a. The Container Toolkit — Lists, tuples, and dictionaries — and knowing which to reach for</p>
+
+  <div class="sysmsg">
+    <span class="sys-label">SYSTEM MESSAGE</span>
+    <p>Three vaults appear before you, each built to hold your hoard differently. Choose the wrong one and the treasure inside will not behave as expected.</p>
+  </div>
+</header>
+
+<div class="wrap layout" style="--rc:#E879F9">
+  <nav class="toc" aria-label="On this page">
+    <a href="#lore">Lore</a>
+    <a href="#codex">Codex</a>
+    <a href="#trials">Trials</a>
+    <a href="#backlash">Backlash</a>
+  </nav>
+
+  <main class="prose" style="--rc:#E879F9">
+    <h2 id="lore">Lore</h2>
+    <p>A single variable holds one fact. Real problems involve <em>collections</em> of facts: every student's marks,
+every city's population, every film in a catalogue. Python gives you three workhorse containers, and
+they are not interchangeable — each encodes a different promise about the data.</p>
+<p>A <strong>list</strong> is ordered and changeable. Use it as your default whenever you have a sequence of similar
+things that might grow, shrink, or be reordered.</p>
+<p>A <strong>tuple</strong> is ordered and <em>fixed</em>. Once created it cannot be modified. That immutability sounds like a
+limitation but is really a guarantee: a coordinate pair, an RGB colour, a database row — things that
+should not accidentally change. Because tuples are immutable they are also hashable, which means they
+can be dictionary keys where lists cannot.</p>
+<p>A <strong>dictionary</strong> abandons position entirely and organises by <strong>key</strong>. Instead of "the third item", you
+ask for "the item filed under <code>'Mumbai'</code>". Lookup is near-instant no matter how large the dictionary
+gets, because keys are hashed rather than searched.</p>
+<p>The professional habit worth building here is <em>modelling</em>: before writing any loop, ask what shape the
+data really has. A list of dictionaries — the structure used for the movie catalogue in this chapter —
+is the shape almost every real dataset takes, and it is exactly what a Pandas DataFrame becomes in
+Experiment 10.</p>
+
+    <div class="emblem-banner reveal" style="--rc:#E879F9"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="58" width="30" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="4"/>
+  <rect x="52" y="46" width="32" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="4"/>
+  <rect x="24" y="28" width="20" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="4"/>
+  <circle cx="68" cy="60" r="3" fill="currentColor"/>
+</svg></div>
+
+    <h2 id="codex">Codex</h2>
+    <h3>Quick comparison</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>List</th>
+<th>Tuple</th>
+<th>Dict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Written as</td>
+<td><code>[1, 2, 3]</code></td>
+<td><code>(1, 2, 3)</code></td>
+<td><code>{"a": 1}</code></td>
+</tr>
+<tr>
+<td>Ordered</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes (insertion order)</td>
+</tr>
+<tr>
+<td>Changeable</td>
+<td>yes</td>
+<td><strong>no</strong></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Duplicates</td>
+<td>yes</td>
+<td>yes</td>
+<td>keys must be unique</td>
+</tr>
+<tr>
+<td>Access by</td>
+<td>position</td>
+<td>position</td>
+<td>key</td>
+</tr>
+<tr>
+<td>Can be a dict key</td>
+<td>no</td>
+<td><strong>yes</strong></td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h3>List comprehensions</h3>
+<p>The comprehension is Python's signature construct — a loop, a filter and a result in one line:</p>
+<pre><code class="language-python">squares = [n * n for n in range(10) if n % 2 == 0]
+</code></pre>
+<p>Read it left to right as English: <em>"n times n, for each n in range 10, where n is even."</em> Use them for
+straightforward transformations; if you need several statements or nested conditions, a normal loop is
+clearer, and clarity wins.</p>
+<h3>Working with dictionaries</h3>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d.keys()</code></td>
+<td>all the keys</td>
+</tr>
+<tr>
+<td><code>d.values()</code></td>
+<td>all the values</td>
+</tr>
+<tr>
+<td><code>d.items()</code></td>
+<td>key-value pairs, ideal for looping</td>
+</tr>
+<tr>
+<td><code>d.get(k, default)</code></td>
+<td>the value, or a fallback if the key is missing</td>
+</tr>
+</tbody>
+</table>
+<p><code>.get()</code> with a default is what makes the counting idiom safe — no <code>KeyError</code> on the first sighting of
+a new key.</p>
+<h3>Sorting with a key</h3>
+<p><code>sorted(data, key=..., reverse=True)</code> sorts any collection. The <code>key</code> argument takes a function that
+extracts what to sort <em>by</em> — <code>key=len</code> sorts strings by length, <code>key=lambda m: m["year"]</code> sorts a list
+of dictionaries by a field. This is the general tool behind "find the runner-up", "find the longest",
+and every ranking problem.</p>
+
+    <h2 id="trials">The trials</h2>
+    <p>Lore is only theory. Each trial below must be cast and cleared —
+       objective stated, spell cast, result confirmed.</p>
+    
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 6.1</p>
+        <h3 id="task-1">Task 1 — Tallying Values in a Fixed Range (0-3)</h3>
+        <p><code>collections.Counter</code> does the counting; a dict comprehension fills in any
+value from 0-3 that never appeared, so the report is always complete.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[1]</div>
+            <div class="scroll-body"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">readings</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">tally</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
+
+<span class="n">full_report</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">tally</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)}</span>
+<span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">occurrences</span> <span class="ow">in</span> <span class="n">full_report</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> occurred </span><span class="si">{</span><span class="n">occurrences</span><span class="si">}</span><span class="s2"> time(s)&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[1]</div>
+          <div class="scroll-body"><pre>0 occurred 2 time(s)
+1 occurred 3 time(s)
+2 occurred 3 time(s)
+3 occurred 4 time(s)
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 6.2</p>
+        <h3 id="task-2">Task 2 — Average of a Numeric Tuple</h3>
+        
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[2]</div>
+            <div class="scroll-body"><pre><span class="n">measurements</span> <span class="o">=</span> <span class="p">(</span><span class="mf">22.5</span><span class="p">,</span> <span class="mf">19.0</span><span class="p">,</span> <span class="mf">31.2</span><span class="p">,</span> <span class="mf">27.8</span><span class="p">,</span> <span class="mf">24.4</span><span class="p">)</span>
+<span class="n">mean_value</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">measurements</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">measurements</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tuple:&quot;</span><span class="p">,</span> <span class="n">measurements</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average: </span><span class="si">{</span><span class="n">mean_value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[2]</div>
+          <div class="scroll-body"><pre>Tuple: (22.5, 19.0, 31.2, 27.8, 24.4)
+Average: 24.98
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 6.3</p>
+        <h3 id="task-3">Task 3 — Runner-Up Score</h3>
+        <p>Sort the distinct scores in descending order and pick the second entry.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[3]</div>
+            <div class="scroll-body"><pre><span class="n">match_scores</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="n">distinct_desc</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">match_scores</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">runner_up_score</span> <span class="o">=</span> <span class="n">distinct_desc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Runner-up score:&quot;</span><span class="p">,</span> <span class="n">runner_up_score</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[3]</div>
+          <div class="scroll-body"><pre>Runner-up score: 7
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 6.4</p>
+        <h3 id="task-4">Task 4 — A Name-to-City Dictionary</h3>
+        <p>Names as keys, home city as values, plus a per-city headcount built with
+<code>Counter</code> on the values.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[4]</div>
+            <div class="scroll-body"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">roster</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Ishaan&quot;</span><span class="p">:</span> <span class="s2">&quot;Pune&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Tanvi&quot;</span><span class="p">:</span> <span class="s2">&quot;Nagpur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Devika&quot;</span><span class="p">:</span> <span class="s2">&quot;Pune&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Farhan&quot;</span><span class="p">:</span> <span class="s2">&quot;Nashik&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Om&quot;</span><span class="p">:</span> <span class="s2">&quot;Nagpur&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Names       :&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">roster</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cities      :&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">roster</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Name -&gt; City:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">person</span><span class="p">,</span> <span class="n">hometown</span> <span class="ow">in</span> <span class="n">roster</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">person</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">hometown</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">city_headcount</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">roster</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Students per city:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">city</span><span class="p">,</span> <span class="n">total</span> <span class="ow">in</span> <span class="n">city_headcount</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">city</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[4]</div>
+          <div class="scroll-body"><pre>Names       : [&#x27;Ishaan&#x27;, &#x27;Tanvi&#x27;, &#x27;Devika&#x27;, &#x27;Farhan&#x27;, &#x27;Om&#x27;]
+Cities      : [&#x27;Pune&#x27;, &#x27;Nagpur&#x27;, &#x27;Pune&#x27;, &#x27;Nashik&#x27;, &#x27;Nagpur&#x27;]
+
+Name -&gt; City:
+  Ishaan -&gt; Pune
+  Tanvi -&gt; Nagpur
+  Devika -&gt; Pune
+  Farhan -&gt; Nashik
+  Om -&gt; Nagpur
+
+Students per city:
+  Pune: 2
+  Nagpur: 2
+  Nashik: 1
+</pre></div>
+        </div>
+        </div>
+      </section>
+      <section class="trial reveal">
+        <p class="trial-tag">Trial 6.5</p>
+        <h3 id="task-5">Task 5 — A Small Movie Catalog</h3>
+        <p>A list of dictionaries, one per movie, queried a few different ways:
+pre-2015 releases, profitable titles, and films by a chosen director.</p>
+        <div class="scroll">
+          <div class="scroll-row">
+            <div class="scroll-gutter">CAST[5]</div>
+            <div class="scroll-body"><pre><span class="n">catalog</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Silver Horizon&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">2011</span><span class="p">,</span> <span class="s2">&quot;director&quot;</span><span class="p">:</span> <span class="s2">&quot;Meera Nair&quot;</span><span class="p">,</span> <span class="s2">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;gross&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Echo Point&quot;</span><span class="p">,</span>     <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">2019</span><span class="p">,</span> <span class="s2">&quot;director&quot;</span><span class="p">:</span> <span class="s2">&quot;Sanjay Rao&quot;</span><span class="p">,</span> <span class="s2">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;gross&quot;</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The Last Reel&quot;</span><span class="p">,</span>  <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="mi">2013</span><span class="p">,</span> <span class="s2">&quot;director&quot;</span><span class="p">:</span> <span class="s2">&quot;Meera Nair&quot;</span><span class="p">,</span> <span class="s2">&quot;budget&quot;</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span> <span class="s2">&quot;gross&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Full catalog:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">film</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">film</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Released before 2015:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">film</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2015</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Profitable titles:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">film</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;gross&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;budget&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">])</span>
+
+<span class="n">chosen_director</span> <span class="o">=</span> <span class="s2">&quot;Meera Nair&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Directed by </span><span class="si">{</span><span class="n">chosen_director</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">film</span> <span class="ow">in</span> <span class="n">catalog</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;director&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">chosen_director</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">film</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">])</span>
+</pre></div>
+          </div>
+        <div class="scroll-row output">
+          <div class="scroll-gutter result">RESULT[5]</div>
+          <div class="scroll-body"><pre>Full catalog:
+  {&#x27;title&#x27;: &#x27;Silver Horizon&#x27;, &#x27;year&#x27;: 2011, &#x27;director&#x27;: &#x27;Meera Nair&#x27;, &#x27;budget&#x27;: 60, &#x27;gross&#x27;: 95}
+  {&#x27;title&#x27;: &#x27;Echo Point&#x27;, &#x27;year&#x27;: 2019, &#x27;director&#x27;: &#x27;Sanjay Rao&#x27;, &#x27;budget&#x27;: 80, &#x27;gross&#x27;: 70}
+  {&#x27;title&#x27;: &#x27;The Last Reel&#x27;, &#x27;year&#x27;: 2013, &#x27;director&#x27;: &#x27;Meera Nair&#x27;, &#x27;budget&#x27;: 35, &#x27;gross&#x27;: 50}
+
+Released before 2015:
+  Silver Horizon
+  The Last Reel
+
+Profitable titles:
+  Silver Horizon
+  The Last Reel
+
+Directed by Meera Nair:
+  Silver Horizon
+  The Last Reel
+</pre></div>
+        </div>
+        </div>
+      </section>
+
+    <h2 id="backlash">Backlash risks</h2>
+    <p>Every skill has a cost when mishandled. These are the ways this one bites back.</p>
+    <div class="backlash"><div class="curse"><b><code>=</code> does not copy a list</b><span><code>b = a</code> makes both names point at the <em>same</em> list. Use <code>a.copy()</code> or <code>a[:]</code> for a genuine copy.</span></div><div class="curse"><b>The single-item tuple</b><span><code>(5)</code> is just the number 5. A one-element tuple needs the comma: <code>(5,)</code>.</span></div><div class="curse"><b><code>KeyError</code> on a missing key</b><span><code>d[k]</code> raises if the key is absent; <code>d.get(k, default)</code> doesn't.</span></div><div class="curse"><b>Sorting mixed types</b><span><code>sorted([1, "two"])</code> raises a <code>TypeError</code>. Sort comparable things.</span></div></div>
+
+    <div class="mastery">
+      <div class="m-top">✦ Mastery confirmed</div>
+      <p>Rank C+ — <b>The Vaultkeeper&#x27;s Art</b> is now yours. All 5 trials
+         cleared, all spells verified against real output.</p>
+      <p style="margin-top:.6rem; font-family:var(--font-hud); font-size:.66rem; letter-spacing:.05em; color:var(--ink-mute);">
+        saved locally to this browser · visible on your Status Window
+      </p>
+    </div>
+
+    <div class="chronicle reveal">
+      <div class="chronicle-label">◆ Chronicle — what this power actually did</div>
+      <p>Your work no longer lives in scattered, parallel scraps. Vibhu Gautam can no longer dock marks for &#x27;disorganized submission&#x27; — everything has its vault now.</p>
+    </div>
+
+    <nav class="trialnav"><a href="trial-5.html"><small>Previous trial</small><b>Word-Weaving &amp; Set Sorcery</b></a><a class="next" href="trial-7.html"><small>Next trial</small><b>Summoning Circles</b></a></nav>
+  </main>
+</div>
+
+<footer class="foot wrap">
+  <span>Trial 06 · The Vaultkeeper&#x27;s Art</span>
+  <span><a href="index.html">Return to the Status Window</a></span>
+</footer>
+
+<script>
+(function () {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .04 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (links.length) {
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = targets.indexOf(e.target);
+        if (i < 0) return;
+        links.forEach(function (l) { l.classList.remove('active'); });
+        links[i].classList.add('active');
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    targets.forEach(function (t) { if (t) spy.observe(t); });
+  }
+})();
+</script>
+
+
+<script src="assets/progress.js"></script>
+</body>
+</html>
